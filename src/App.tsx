@@ -1,5 +1,9 @@
-function App() {
-    return  <div>empty</div>;
-}
+import { MainPlayground } from "./components/main-playground.tsx";
 
-export default App
+export default function MyApp() {
+  return (
+    <>
+      <MainPlayground />
+    </>
+  );
+}
