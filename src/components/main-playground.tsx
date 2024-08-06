@@ -6,6 +6,7 @@ import { isRelatedCell } from "../utils/location.ts";
 
 type SudokuCell = {
   value: number;
+  answer: number;
   type: "known" | "unknown" | "errorAnswer";
 };
 type SudokuAllData = {
@@ -15,28 +16,39 @@ type SudokuAllData = {
 
 function initASudoku(): SudokuAllData {
   // TODO: mock it temporarily
+  const data = {
+    mission:
+      "400800007350672004280000103000007000028300400070204916092405030800763009730000051",
+    solution:
+      "469831527351672894287549163946157382128396475573284916692415738815763249734928651",
+  };
   return {
-    matrix: fillCells(
-      "902730400080049000370051920000000057210000396000910080531000072640500830007003540",
-    ),
+    matrix: fillCells(data.mission, data.solution),
     selectedPosition: undefined,
   };
 }
-function fillCells(val: string): SudokuCell[][] {
+function fillCells(mission: string, solution: string): SudokuCell[][] {
   const result: SudokuCell[][] = [];
-  if (val.length !== 81) {
+  if (mission.length !== 81 || solution.length !== 81) {
     throw Error("Invalid input");
   }
-  const rowsString: string[] = [];
+  const missionRowsString: string[] = [];
+  const solutionRowsString: string[] = [];
   for (let i = 0; i < 9; i++) {
-    rowsString.push(val.slice(i * 9, (i + 1) * 9));
+    missionRowsString.push(mission.slice(i * 9, (i + 1) * 9));
+    solutionRowsString.push(solution.slice(i * 9, (i + 1) * 9));
   }
-  rowsString.forEach((rowString) => {
+  missionRowsString.forEach((rowString, rowIndex) => {
     const row: SudokuCell[] = [];
     result.push(row);
     for (let i = 0; i < rowString.length; i++) {
       const value = +rowString[i];
-      row.push({ value: value, type: value === 0 ? "unknown" : "known" });
+
+      row.push({
+        value: value,
+        type: value === 0 ? "unknown" : "known",
+        answer: +solutionRowsString[rowIndex][i],
+      });
     }
   });
 
@@ -137,6 +149,7 @@ export function MainPlayground() {
                               selectedValue === 0)
                           : false,
                         "text-blue-800": cell.type === "unknown",
+                        "text-red-500": cell.value !== cell.answer,
                         "bg-blue-600 text-white":
                           cell.value === selectedValue && cell.value !== 0,
 
