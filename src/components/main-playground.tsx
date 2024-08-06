@@ -44,6 +44,7 @@ function fillCells(val: string): SudokuCell[][] {
 
 export function MainPlayground() {
   const [sudokuData, setSudokuData] = useState(initASudoku());
+  const selectedValue = getSelectCell()?.value;
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     if (!sudokuData.selectedPosition) return;
@@ -88,16 +89,69 @@ export function MainPlayground() {
       selectedPosition: { rowIndex, colIndex },
     });
   }
+
+  function getSelectCell() {
+    if (!sudokuData.selectedPosition) return;
+    const { rowIndex, colIndex } = sudokuData.selectedPosition;
+    return sudokuData.matrix[rowIndex][colIndex];
+  }
+
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
     const matrix = sudokuData.matrix;
     const cell = matrix[rowIndex][colIndex];
     if (cell.type !== "unknown" || val < 0 || val > 9) {
       return;
     }
-
     cell.value = val;
-
     setSudokuData({ ...sudokuData, matrix });
+  }
+  function isInSameRow(rowIndex: number): boolean {
+    if (!sudokuData.selectedPosition) return false;
+    const { rowIndex: selectedRowIndex } = sudokuData.selectedPosition;
+
+    return rowIndex === selectedRowIndex;
+  }
+
+  function isInSameColumn(colIndex: number): boolean {
+    if (!sudokuData.selectedPosition) return false;
+    const { colIndex: selectedColIndex } = sudokuData.selectedPosition;
+
+    return colIndex === selectedColIndex;
+  }
+
+  function isInSameBlock(rowIndex: number, colIndex: number): boolean {
+    if (!sudokuData.selectedPosition) return false;
+    const { rowIndex: selectedRowIndex, colIndex: selectedColIndex } =
+      sudokuData.selectedPosition;
+
+    // Determine the top-left cell of the 3x3 block that contains the selected cell
+    const blockStartRowIndex = Math.floor(selectedRowIndex / 3) * 3;
+    const blockStartColIndex = Math.floor(selectedColIndex / 3) * 3;
+
+    // Check if the given cell (rowIndex, colIndex) is within the same block
+    return (
+      rowIndex >= blockStartRowIndex &&
+      rowIndex < blockStartRowIndex + 3 &&
+      colIndex >= blockStartColIndex &&
+      colIndex < blockStartColIndex + 3
+    );
+  }
+
+  function isRelatedCell(rowIndex: number, colIndex: number): boolean {
+    if (!sudokuData.selectedPosition) {
+      return false;
+    }
+    if (
+      sudokuData.selectedPosition.rowIndex === rowIndex &&
+      sudokuData.selectedPosition.colIndex === colIndex
+    ) {
+      return false;
+    }
+    return (
+      isInSameRow(rowIndex) ||
+      isInSameColumn(colIndex) ||
+      isInSameBlock(rowIndex, colIndex)
+    );
   }
 
   return (
@@ -120,7 +174,14 @@ export function MainPlayground() {
                       "cursor-pointer sudoku-cell" +
                       classNames({
                         "bg-blue-200": isSelected(rowIdx, colIndex),
-                        "text-blue-700": cell.type === "unknown",
+                        "bg-neutral-200":
+                          isRelatedCell(rowIdx, colIndex) &&
+                          // keep highlight background color of same value cells.
+                          (selectedValue !== cell.value || selectedValue === 0),
+                        "text-blue-800": cell.type === "unknown",
+                        "bg-blue-600 text-white":
+                          cell.value === selectedValue && cell.value !== 0,
+
                         "border-solid border-r border-r-black":
                           colIndex == 2 || colIndex === 5,
                       })
@@ -139,3 +200,10 @@ export function MainPlayground() {
     </div>
   );
 }
+
+/**
+ * TODO List
+ *
+ * improvement:
+ * 1. Add animation when moving the selected cell.
+ */
