@@ -2,6 +2,7 @@ import "./main-playground.css";
 import { KeyboardEventHandler, useState } from "react";
 import { classNames } from "../utils/common.ts";
 import { throttle } from "lodash";
+import { isRelatedCell } from "../utils/location.ts";
 
 type SudokuCell = {
   value: number;
@@ -105,64 +106,16 @@ export function MainPlayground() {
     cell.value = val;
     setSudokuData({ ...sudokuData, matrix });
   }
-  function isInSameRow(rowIndex: number): boolean {
-    if (!sudokuData.selectedPosition) return false;
-    const { rowIndex: selectedRowIndex } = sudokuData.selectedPosition;
-
-    return rowIndex === selectedRowIndex;
-  }
-
-  function isInSameColumn(colIndex: number): boolean {
-    if (!sudokuData.selectedPosition) return false;
-    const { colIndex: selectedColIndex } = sudokuData.selectedPosition;
-
-    return colIndex === selectedColIndex;
-  }
-
-  function isInSameBlock(rowIndex: number, colIndex: number): boolean {
-    if (!sudokuData.selectedPosition) return false;
-    const { rowIndex: selectedRowIndex, colIndex: selectedColIndex } =
-      sudokuData.selectedPosition;
-
-    // Determine the top-left cell of the 3x3 block that contains the selected cell
-    const blockStartRowIndex = Math.floor(selectedRowIndex / 3) * 3;
-    const blockStartColIndex = Math.floor(selectedColIndex / 3) * 3;
-
-    // Check if the given cell (rowIndex, colIndex) is within the same block
-    return (
-      rowIndex >= blockStartRowIndex &&
-      rowIndex < blockStartRowIndex + 3 &&
-      colIndex >= blockStartColIndex &&
-      colIndex < blockStartColIndex + 3
-    );
-  }
-
-  function isRelatedCell(rowIndex: number, colIndex: number): boolean {
-    if (!sudokuData.selectedPosition) {
-      return false;
-    }
-    if (
-      sudokuData.selectedPosition.rowIndex === rowIndex &&
-      sudokuData.selectedPosition.colIndex === colIndex
-    ) {
-      return false;
-    }
-    return (
-      isInSameRow(rowIndex) ||
-      isInSameColumn(colIndex) ||
-      isInSameBlock(rowIndex, colIndex)
-    );
-  }
 
   return (
     <div className="p-4">
       <table className="sudoku-table" tabIndex={1} onKeyDown={handleKeyDown}>
         <tbody>
-          {sudokuData.matrix.map((row, rowIdx) => (
+          {sudokuData.matrix.map((row, rowIndex) => (
             <tr
-              key={rowIdx}
+              key={rowIndex}
               className={
-                rowIdx === 2 || rowIdx === 5
+                rowIndex === 2 || rowIndex === 5
                   ? "border-solid border-b border-b-black"
                   : undefined
               }
@@ -173,11 +126,16 @@ export function MainPlayground() {
                     className={
                       "cursor-pointer sudoku-cell" +
                       classNames({
-                        "bg-blue-200": isSelected(rowIdx, colIndex),
-                        "bg-neutral-200":
-                          isRelatedCell(rowIdx, colIndex) &&
-                          // keep highlight background color of same value cells.
-                          (selectedValue !== cell.value || selectedValue === 0),
+                        "bg-blue-200": isSelected(rowIndex, colIndex),
+                        "bg-neutral-200": sudokuData.selectedPosition
+                          ? isRelatedCell(
+                              { rowIndex, colIndex },
+                              sudokuData.selectedPosition,
+                            ) &&
+                            // keep highlight background color of same value cells.
+                            (selectedValue !== cell.value ||
+                              selectedValue === 0)
+                          : false,
                         "text-blue-800": cell.type === "unknown",
                         "bg-blue-600 text-white":
                           cell.value === selectedValue && cell.value !== 0,
@@ -187,7 +145,7 @@ export function MainPlayground() {
                       })
                     }
                     key={colIndex}
-                    onClick={() => onTdClick(rowIdx, colIndex)}
+                    onClick={() => onTdClick(rowIndex, colIndex)}
                   >
                     {cell.value === 0 ? undefined : cell.value}
                   </td>
