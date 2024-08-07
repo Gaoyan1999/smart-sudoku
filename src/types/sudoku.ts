@@ -1,6 +1,8 @@
 export type SudokuCell = {
   value: number;
-  answer: number;
+  realAnswer: number;
+  // TODO: comment
+  notingCandidates: number[];
   type: "known" | "unknown" | "errorAnswer";
 };
 
@@ -12,6 +14,6 @@ export type SudokuData = {
 export type SudoKuContext = {
   mode: "normal" | "noting";
   isPause: boolean;
-  switchMode: ()=> void;
-  togglePause: ()=> void;
+  switchMode: () => void;
+  togglePause: () => void;
 };

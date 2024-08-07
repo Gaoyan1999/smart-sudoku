@@ -56,12 +56,18 @@ export default function MyApp() {
     const targetCell = matrix[rowIndex][colIndex];
     if (targetCell.type !== "unknown") {
       return;
+    } else if (code === "Backspace") {
+      setCellValue(rowIndex, colIndex, 0);
+      setNotingCandidates(rowIndex, colIndex, 0);
     }
     const is1To9 = /^Digit[1-9]$/;
     if (is1To9.test(code)) {
-      setCellValue(rowIndex, colIndex, +code[5]);
-    } else if (code === "Backspace") {
-      setCellValue(rowIndex, colIndex, 0);
+      const num = +code[5];
+      if (sudokuContext.mode === "normal") {
+        setCellValue(rowIndex, colIndex, num);
+      } else {
+        setNotingCandidates(rowIndex, colIndex, num);
+      }
     }
   }, 100);
   function setPosition(rowIndex: number, colIndex: number) {
@@ -77,6 +83,31 @@ export default function MyApp() {
       return;
     }
     cell.value = val;
+    setSudokuData({ ...sudokuData, matrix });
+  }
+  function setNotingCandidates(
+    rowIndex: number,
+    colIndex: number,
+    candidateNumber: number,
+  ) {
+    const matrix = sudokuData.matrix;
+    const cell = matrix[rowIndex][colIndex];
+    if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
+      return;
+    }
+    if (candidateNumber === 0) {
+      cell.notingCandidates = [];
+      setSudokuData({ ...sudokuData, matrix });
+      return;
+    }
+
+    const { notingCandidates } = cell;
+    const idx = notingCandidates.findIndex((num) => num === candidateNumber);
+    if (idx === -1) {
+      notingCandidates.push(candidateNumber);
+    } else {
+      notingCandidates.splice(idx, 1);
+    }
     setSudokuData({ ...sudokuData, matrix });
   }
 

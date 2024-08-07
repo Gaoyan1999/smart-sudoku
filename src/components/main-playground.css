@@ -1,9 +1,19 @@
 .sudoku-table {
-  @apply m-auto border border-black border-solid;
+  @apply border border-black border-solid;
   outline: none;
 }
 
 .sudoku-cell {
-  @apply w-10 h-10 m-auto text-center;
+  @apply w-12 h-12 m-auto text-center p-0;
   @apply border-solid border-neutral-400 border-[0.5px];
+  .normal-mode-cell {
+    @apply w-12 h-12;
+    line-height: 48px;
+  }
+  .noting-cell {
+    @apply grid  w-full h-full overflow-hidden;
+    @apply text-xs text-neutral-500;
+    grid-template-rows: repeat(3, 16px);
+    grid-template-columns: repeat(3, 16px);
+  }
 }

@@ -34,7 +34,8 @@ function fillCells(mission: string, solution: string): SudokuCell[][] {
       row.push({
         value: value,
         type: value === 0 ? "unknown" : "known",
-        answer: +solutionRowsString[rowIndex][i],
+        realAnswer: +solutionRowsString[rowIndex][i],
+        notingCandidates: [],
       });
     }
   });
