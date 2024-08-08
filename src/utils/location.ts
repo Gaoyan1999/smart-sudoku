@@ -1,4 +1,6 @@
 // Define a type for position
+import { SudokuCell } from "../types/sudoku.ts";
+
 export type Position = {
   rowIndex: number;
   colIndex: number;
@@ -45,4 +47,16 @@ function isInSameBlock(posA: Position, posB: Position): boolean {
     posB.colIndex >= blockStartColIndex &&
     posB.colIndex < blockStartColIndex + 3
   );
+}
+
+export function getRelateCells(position: Position, matrix: SudokuCell[][]) {
+  const result: SudokuCell[] = [];
+  matrix.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (isRelatedCell(position, { rowIndex, colIndex })) {
+        result.push(cell);
+      }
+    });
+  });
+  return result;
 }

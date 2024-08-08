@@ -2,8 +2,9 @@ import { MainPlayground } from "./components/main-playground.tsx";
 import { ToolArea } from "./components/tool-area.tsx";
 import { createContext, KeyboardEventHandler, useState } from "react";
 import { SudoKuContext } from "./types/sudoku.ts";
-import { noop, throttle } from "lodash";
-import { initASudoku } from "./components/sudoku.ts";
+import { noop, remove, throttle } from "lodash";
+import { fillAllCandidate, initASudoku } from "./components/sudoku.ts";
+import { getRelateCells } from "./utils/location.ts";
 
 export const SudokuContext = createContext<
   SudoKuContext & { switchMode: () => void }
@@ -38,6 +39,13 @@ export default function MyApp() {
       switchMode();
       return;
     }
+    if (code === "KeyC") {
+      setSudokuData((data) => ({
+        ...data,
+        matrix: fillAllCandidate(sudokuData.matrix),
+      }));
+    }
+
     // Cell control
     if (!sudokuData.selectedPosition) return;
     const { rowIndex, colIndex } = sudokuData.selectedPosition;
@@ -56,12 +64,26 @@ export default function MyApp() {
     const targetCell = matrix[rowIndex][colIndex];
     if (targetCell.type !== "unknown") {
       return;
+    } else if (code === "Backspace") {
+      setCellValue(rowIndex, colIndex, 0);
+      setNotingCandidates(rowIndex, colIndex, 0);
     }
     const is1To9 = /^Digit[1-9]$/;
     if (is1To9.test(code)) {
-      setCellValue(rowIndex, colIndex, +code[5]);
-    } else if (code === "Backspace") {
-      setCellValue(rowIndex, colIndex, 0);
+      const num = +code[5];
+      if (sudokuContext.mode === "normal") {
+        setCellValue(rowIndex, colIndex, num);
+        // remove the candidate numbers in related cells.
+        getRelateCells({ rowIndex, colIndex }, matrix).filter((cell) => {
+          remove(cell.notingCandidates, (value) => value === num);
+        });
+        setSudokuData((data) => ({
+          ...data,
+          matrix: fillAllCandidate(sudokuData.matrix),
+        }));
+      } else {
+        setNotingCandidates(rowIndex, colIndex, num);
+      }
     }
   }, 100);
   function setPosition(rowIndex: number, colIndex: number) {
@@ -77,6 +99,31 @@ export default function MyApp() {
       return;
     }
     cell.value = val;
+    setSudokuData({ ...sudokuData, matrix });
+  }
+  function setNotingCandidates(
+    rowIndex: number,
+    colIndex: number,
+    candidateNumber: number,
+  ) {
+    const matrix = sudokuData.matrix;
+    const cell = matrix[rowIndex][colIndex];
+    if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
+      return;
+    }
+    if (candidateNumber === 0) {
+      cell.notingCandidates = [];
+      setSudokuData({ ...sudokuData, matrix });
+      return;
+    }
+
+    const { notingCandidates } = cell;
+    const idx = notingCandidates.findIndex((num) => num === candidateNumber);
+    if (idx === -1) {
+      notingCandidates.push(candidateNumber);
+    } else {
+      notingCandidates.splice(idx, 1);
+    }
     setSudokuData({ ...sudokuData, matrix });
   }
 
@@ -95,7 +142,7 @@ export default function MyApp() {
             setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause })),
         }}
       >
-        <div className="w-3/12">
+        <div className="w-4/12">
           <ToolArea />
         </div>
         <div className="w-8/12">

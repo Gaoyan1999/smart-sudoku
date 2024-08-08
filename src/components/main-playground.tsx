@@ -2,6 +2,7 @@ import "./main-playground.css";
 import { classNames } from "../utils/common.ts";
 import { isRelatedCell } from "../utils/location.ts";
 import { SudokuData } from "../types/sudoku.ts";
+import { NotingCell } from "./noting-cell.tsx";
 
 export function MainPlayground({
   matrix,
@@ -39,11 +40,18 @@ export function MainPlayground({
             }
           >
             {row.map((cell, colIndex) => {
+              const showNotingCell =
+                cell.value === 0 && cell.notingCandidates.length > 0;
               return (
                 <td
+                  key={colIndex}
                   className={
-                    "cursor-pointer sudoku-cell" +
+                    "sudoku-cell cursor-pointer" +
                     classNames({
+                      // border setting
+                      "border-solid border-r border-r-black":
+                        colIndex == 2 || colIndex === 5,
+                      // background setting
                       "bg-blue-200": isSelected(rowIndex, colIndex),
                       "bg-neutral-200": selectedPosition
                         ? isRelatedCell(
@@ -53,19 +61,35 @@ export function MainPlayground({
                           // keep highlight background color of same value cells.
                           (selectedValue !== cell.value || selectedValue === 0)
                         : false,
-                      "text-blue-800": cell.type === "unknown",
-                      "text-red-500": cell.value !== cell.answer,
-                      "bg-blue-600 text-white":
-                        cell.value === selectedValue && cell.value !== 0,
-
-                      "border-solid border-r border-r-black":
-                        colIndex == 2 || colIndex === 5,
                     })
                   }
-                  key={colIndex}
                   onClick={() => onTdClick(rowIndex, colIndex)}
                 >
-                  {cell.value === 0 ? undefined : cell.value}
+                  {showNotingCell && (
+                    <NotingCell
+                      selectNumber={selectedValue}
+                      notingNumbers={cell.notingCandidates}
+                    />
+                  )}
+                  {!showNotingCell && (
+                    <div
+                      className={
+                        "normal-mode-cell" +
+                        classNames({
+                          "text-blue-800": cell.type === "unknown",
+                          "bg-blue-600":
+                            cell.value === selectedValue && cell.value !== 0,
+                          "bg-blue-600 text-white":
+                            cell.value === selectedValue &&
+                            cell.value !== 0 &&
+                            cell.value === cell.realAnswer,
+                          "text-red-500": cell.value !== cell.realAnswer,
+                        })
+                      }
+                    >
+                      {cell.value === 0 ? undefined : cell.value}
+                    </div>
+                  )}
                 </td>
               );
             })}
