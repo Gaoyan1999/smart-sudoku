@@ -2,8 +2,6 @@ import "./main-playground.css";
 import { classNames } from "../utils/common.ts";
 import { isRelatedCell } from "../utils/location.ts";
 import { SudokuData } from "../types/sudoku.ts";
-import { useContext } from "react";
-import { SudokuContext } from "../App.tsx";
 import { NotingCell } from "./noting-cell.tsx";
 
 export function MainPlayground({
@@ -12,8 +10,6 @@ export function MainPlayground({
   setPosition,
 }: SudokuData & { setPosition: (rowIndex: number, colIndex: number) => void }) {
   const selectedValue = getSelectCell()?.value;
-
-  const { mode } = useContext(SudokuContext);
 
   function isSelected(i: number, j: number) {
     if (!selectedPosition) return false;
@@ -44,12 +40,13 @@ export function MainPlayground({
             }
           >
             {row.map((cell, colIndex) => {
-              const showNotingCell = mode === "noting" && cell.value === 0;
+              const showNotingCell =
+                cell.value === 0 && cell.notingCandidates.length > 0;
               return (
                 <td
                   key={colIndex}
                   className={
-                    "sudoku-cell" +
+                    "sudoku-cell cursor-pointer" +
                     classNames({
                       // border setting
                       "border-solid border-r border-r-black":
@@ -80,9 +77,13 @@ export function MainPlayground({
                         "normal-mode-cell" +
                         classNames({
                           "text-blue-800": cell.type === "unknown",
-                          "text-red-500": cell.value !== cell.realAnswer,
-                          "bg-blue-600 text-white":
+                          "bg-blue-600":
                             cell.value === selectedValue && cell.value !== 0,
+                          "bg-blue-600 text-white":
+                            cell.value === selectedValue &&
+                            cell.value !== 0 &&
+                            cell.value === cell.realAnswer,
+                          "text-red-500": cell.value !== cell.realAnswer,
                         })
                       }
                     >

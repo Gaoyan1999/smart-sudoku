@@ -1,4 +1,6 @@
 import { SudokuData, SudokuCell } from "../types/sudoku.ts";
+import { uniq } from "lodash";
+import { getRelateCells } from "../utils/location.ts";
 
 export function initASudoku(): SudokuData {
   // TODO: mock it temporarily
@@ -41,4 +43,29 @@ function fillCells(mission: string, solution: string): SudokuCell[][] {
   });
 
   return result;
+}
+
+function findMissingNumbers(nums: number[]) {
+  const results: number[] = [];
+  for (let i = 1; i <= 9; i++) {
+    if (!nums.includes(i)) {
+      results.push(i);
+    }
+  }
+  return results;
+}
+
+export function fillAllCandidate(matrix: SudokuData["matrix"]) {
+  matrix.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      cell.notingCandidates = findMissingNumbers(
+        uniq(
+          getRelateCells({ rowIndex, colIndex }, matrix)
+            .filter((cell) => cell.value !== 0)
+            .map((cell) => cell.value),
+        ),
+      );
+    });
+  });
+  return matrix;
 }
