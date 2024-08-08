@@ -1,10 +1,23 @@
 import { MainPlayground } from "./components/main-playground.tsx";
 import { ToolArea } from "./components/tool-area.tsx";
-import { createContext, KeyboardEventHandler, useState } from "react";
+import {
+  createContext,
+  KeyboardEventHandler,
+  useEffect,
+  useState,
+} from "react";
 import { SudoKuContext } from "./types/sudoku.ts";
 import { noop, remove, throttle } from "lodash";
-import { fillAllCandidate, initASudoku } from "./components/sudoku.ts";
+import {
+  fillAllCandidate,
+  initASudokuData,
+  initSudoKuContext,
+} from "./components/sudoku.ts";
 import { getRelateCells } from "./utils/location.ts";
+import {
+  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  LOCAL_STORAGE_KEY_SUDOKU_DATA,
+} from "./const.ts";
 
 export const SudokuContext = createContext<
   SudoKuContext & { switchMode: () => void }
@@ -16,14 +29,23 @@ export const SudokuContext = createContext<
 });
 
 export default function MyApp() {
-  const [sudokuContext, setSudokuContext] = useState<
-    Pick<SudoKuContext, "mode" | "isPause">
-  >({
-    mode: "normal",
-    isPause: false,
-  });
+  const [sudokuContext, setSudokuContext] =
+    useState<Pick<SudoKuContext, "mode" | "isPause">>(initSudoKuContext());
 
-  const [sudokuData, setSudokuData] = useState(initASudoku());
+  const [sudokuData, setSudokuData] = useState(initASudokuData());
+
+  useEffect(() => {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_SUDOKU_DATA,
+      JSON.stringify(sudokuData),
+    );
+  });
+  useEffect(() => {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+      JSON.stringify(sudokuContext),
+    );
+  });
 
   function switchMode() {
     setSudokuContext((ctx) => ({

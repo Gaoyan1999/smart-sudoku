@@ -1,8 +1,30 @@
-import { SudokuData, SudokuCell } from "../types/sudoku.ts";
-import { uniq } from "lodash";
+import { SudokuData, SudokuCell, SudoKuContext } from "../types/sudoku.ts";
+import { isEmpty, uniq } from "lodash";
 import { getRelateCells } from "../utils/location.ts";
+import {
+  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  LOCAL_STORAGE_KEY_SUDOKU_DATA,
+} from "../const.ts";
 
-export function initASudoku(): SudokuData {
+export function initSudoKuContext(): Pick<SudoKuContext, "mode" | "isPause"> {
+  const jsonString: string | null = localStorage.getItem(
+    LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  );
+  const defaultValue: Pick<SudoKuContext, "mode" | "isPause"> = {
+    mode: "normal",
+    isPause: false,
+  };
+  if (isEmpty(jsonString) || jsonString === null) {
+    return defaultValue;
+  }
+  try {
+    return JSON.parse(jsonString) as Pick<SudoKuContext, "mode" | "isPause">;
+  } catch (e) {
+    return defaultValue;
+  }
+}
+
+export function initASudokuData(): SudokuData {
   // TODO: mock it temporarily
   const data = {
     mission:
@@ -10,10 +32,22 @@ export function initASudoku(): SudokuData {
     solution:
       "469831527351672894287549163946157382128396475573284916692415738815763249734928651",
   };
-  return {
+  const defaultValue = {
     matrix: fillCells(data.mission, data.solution),
     selectedPosition: undefined,
   };
+
+  const jsonString: string | null = localStorage.getItem(
+    LOCAL_STORAGE_KEY_SUDOKU_DATA,
+  );
+  if (isEmpty(jsonString) || jsonString === null) {
+    return defaultValue;
+  }
+  try {
+    return JSON.parse(jsonString) as SudokuData;
+  } catch (e) {
+    return defaultValue;
+  }
 }
 
 function fillCells(mission: string, solution: string): SudokuCell[][] {
