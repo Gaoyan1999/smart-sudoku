@@ -7,6 +7,7 @@
 - **Selectable Difficulty Levels (Coming Soon)**: Choose from a range of difficulty levels to suit your skill.
 - **Powerful Hints System (Coming Soon)**: Look forward to a robust hints feature to assist you in solving puzzles.
 - **Data Persistence**: Your game progress is saved in the client's cache for a seamless experience.
+- **Import your own sudoku**: You can import your own customized puzzle (via OCR or keyboard input) into smart sudoku, and we can verify this puzzle and solve it. (coming soon)
 
 ## How to setup
 
