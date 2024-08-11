@@ -54,6 +54,13 @@ export default function MyApp() {
     }));
   }
 
+  function fillAddCandidates() {
+    setSudokuData((data) => ({
+      ...data,
+      matrix: fillAllCandidate(sudokuData.matrix),
+    }));
+  }
+
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
     // mode control and some shortcut
@@ -62,10 +69,7 @@ export default function MyApp() {
       return;
     }
     if (code === "KeyC") {
-      setSudokuData((data) => ({
-        ...data,
-        matrix: fillAllCandidate(sudokuData.matrix),
-      }));
+      fillAddCandidates();
     }
 
     // Cell control
@@ -165,7 +169,7 @@ export default function MyApp() {
         }}
       >
         <div className="w-4/12">
-          <ToolArea />
+          <ToolArea showAllCandidates={fillAddCandidates} />
         </div>
         <div className="w-8/12">
           <MainPlayground
