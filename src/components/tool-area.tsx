@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { SudokuContext } from "../App.tsx";
+import { SudokuContext } from "./root.tsx";
 import {
   ToggleButton,
   ToggleButtonGroup,

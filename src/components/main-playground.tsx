@@ -102,10 +102,6 @@ export function MainPlayground({
 
 /**
  * TODO List
- *
- *
- *
  * improvement:
  * 1. Add animation when moving the selected cell.
- * 2. save to local storage
  */
