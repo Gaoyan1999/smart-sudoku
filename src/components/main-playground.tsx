@@ -1,4 +1,4 @@
-import "./main-playground.css";
+import "../style/main-playground.css";
 import { classNames } from "../utils/common.ts";
 import { isRelatedCell } from "../utils/location.ts";
 import { SudokuData } from "../types/sudoku.ts";
