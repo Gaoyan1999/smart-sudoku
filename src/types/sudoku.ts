@@ -12,9 +12,17 @@ export type SudokuData = {
   selectedPosition?: { rowIndex: number; colIndex: number };
 };
 
-export type SudoKuContext = {
+export type SudoKuContext = SudokuDataContext & SudokuContextUpdateFunc;
+
+export type SudokuDataContext = {
   mode: "normal" | "noting";
   isPause: boolean;
+  // unit: second
+  elapsedTime: number;
+};
+
+type SudokuContextUpdateFunc = {
   switchMode: () => void;
   togglePause: () => void;
-};
+  updateElapsedTime: (val: number) => void;
+}
