@@ -1,4 +1,4 @@
-import "./main-playground.css";
+import "../style/main-playground.css";
 import { classNames } from "../utils/common.ts";
 import { isRelatedCell } from "../utils/location.ts";
 import { SudokuData } from "../types/sudoku.ts";
@@ -102,10 +102,6 @@ export function MainPlayground({
 
 /**
  * TODO List
- *
- *
- *
  * improvement:
  * 1. Add animation when moving the selected cell.
- * 2. save to local storage
  */
