@@ -1,14 +1,27 @@
 export function classNames(classObject: Record<string, boolean>) {
   const classNamesArray: string[] = [];
 
-  // 遍历对象的键
+  // traverse the keys of object
   for (const className in classObject) {
-    // 如果对象的值为 true，则将键添加到 classNamesArray 数组中
+    // If true，put the key to classNamesArray
     if (classObject[className]) {
       classNamesArray.push(className);
     }
   }
-
-  // 使用 join 方法将数组转换成一个以空格分隔的字符串
   return " " + classNamesArray.join(" ") + " ";
+}
+
+export function secondToHourAndMinutes(val: number) {
+  function fixZeroStart(val: number) {
+    return val.toString().padStart(2);
+  }
+  const second = val % 60;
+  let minutes = Math.floor(val / 60);
+  const hours = Math.floor(minutes / 60);
+  minutes = minutes % 60;
+  const minutesAndSecondStr =
+    fixZeroStart(minutes) + ":" + fixZeroStart(second);
+  return hours > 0
+    ? fixZeroStart(hours) + ":" + minutesAndSecondStr
+    : minutesAndSecondStr;
 }

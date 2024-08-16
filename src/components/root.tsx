@@ -4,33 +4,32 @@ import {
   useEffect,
   useState,
 } from "react";
-import {SudoKuContext, SudokuDataContext} from "../types/sudoku.ts";
+import { SudoKuContext, SudokuDataContext } from "../types/sudoku.ts";
 import { noop, remove, throttle } from "lodash";
 import { initSudoKuContext, initSudokuData } from "./sudoku.ts";
-import {
-  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
-  LOCAL_STORAGE_KEY_SUDOKU_DATA,
-} from "../const.ts";
 import { getRelateCells } from "../utils/location.ts";
 import { ToolArea } from "./tool-area.tsx";
 import { MainPlayground } from "./main-playground.tsx";
 import { fillAllCandidate } from "../utils/cell-calculation.ts";
 import { InformationBar } from "./Information-bar.tsx";
+import {
+  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  LOCAL_STORAGE_KEY_SUDOKU_DATA,
+} from "../const.ts";
 
-export const SudokuContext = createContext<
-  SudoKuContext & { switchMode: () => void }
->({
+export const SudokuContext = createContext<SudoKuContext>({
   mode: "normal",
   isPause: false,
+  elapsedTime: 0,
   switchMode: noop,
   togglePause: noop,
+  updateElapsedTime: noop,
 });
 
 export default function Root() {
   const [sudokuContext, setSudokuContext] =
-    useState<SudokuDataContext>(initSudoKuContext());
-
-  const [sudokuData, setSudokuData] = useState(initSudokuData());
+    useState<SudokuDataContext>(initSudoKuContext);
+  const [sudokuData, setSudokuData] = useState(initSudokuData);
 
   useEffect(() => {
     localStorage.setItem(
@@ -161,7 +160,9 @@ export default function Root() {
       <SudokuContext.Provider
         value={{
           ...sudokuContext,
-          switchMode: switchMode,
+          switchMode,
+          updateElapsedTime: (val: number) =>
+            setSudokuContext((ctx) => ({ ...ctx, elapsedTime: val })),
           togglePause: () =>
             setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause })),
         }}

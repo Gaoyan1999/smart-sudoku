@@ -1,7 +1,4 @@
-import {
-  SudokuData,
-  SudokuDataContext,
-} from "../types/sudoku.ts";
+import { SudokuData, SudokuDataContext } from "../types/sudoku.ts";
 import { isEmpty } from "lodash";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
@@ -29,6 +26,7 @@ export function initSudoKuContext(): SudokuDataContext {
 }
 
 export function initSudokuData(): SudokuData {
+  console.log("initSudokuData");
   // TODO: mock it temporarily
   const data = {
     mission:
