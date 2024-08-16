@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { SudoKuContext } from "../types/sudoku.ts";
+import {SudoKuContext, SudokuDataContext} from "../types/sudoku.ts";
 import { noop, remove, throttle } from "lodash";
 import { initSudoKuContext, initSudokuData } from "./sudoku.ts";
 import {
@@ -28,7 +28,7 @@ export const SudokuContext = createContext<
 
 export default function Root() {
   const [sudokuContext, setSudokuContext] =
-    useState<Pick<SudoKuContext, "mode" | "isPause">>(initSudoKuContext());
+    useState<SudokuDataContext>(initSudoKuContext());
 
   const [sudokuData, setSudokuData] = useState(initSudokuData());
 

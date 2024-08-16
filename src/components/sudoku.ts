@@ -1,4 +1,7 @@
-import { SudoKuContext, SudokuData } from "../types/sudoku.ts";
+import {
+  SudokuData,
+  SudokuDataContext,
+} from "../types/sudoku.ts";
 import { isEmpty } from "lodash";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
@@ -6,19 +9,20 @@ import {
 } from "../const.ts";
 import { fillCells } from "../utils/cell-calculation.ts";
 
-export function initSudoKuContext(): Pick<SudoKuContext, "mode" | "isPause"> {
+export function initSudoKuContext(): SudokuDataContext {
   const jsonString: string | null = localStorage.getItem(
     LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
   );
-  const defaultValue: Pick<SudoKuContext, "mode" | "isPause"> = {
+  const defaultValue: SudokuDataContext = {
     mode: "normal",
     isPause: false,
+    elapsedTime: 0,
   };
   if (isEmpty(jsonString) || jsonString === null) {
     return defaultValue;
   }
   try {
-    return JSON.parse(jsonString) as Pick<SudoKuContext, "mode" | "isPause">;
+    return JSON.parse(jsonString) as SudokuDataContext;
   } catch (e) {
     return defaultValue;
   }
