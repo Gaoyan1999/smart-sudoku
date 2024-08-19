@@ -24,5 +24,5 @@ export type SudokuDataContext = {
 type SudokuContextUpdateFunc = {
   switchMode: () => void;
   togglePause: () => void;
-  updateElapsedTime: (val: number) => void;
-}
+  updateElapsedTime: () => void;
+};

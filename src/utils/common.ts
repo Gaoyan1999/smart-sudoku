@@ -13,7 +13,7 @@ export function classNames(classObject: Record<string, boolean>) {
 
 export function secondToHourAndMinutes(val: number) {
   function fixZeroStart(val: number) {
-    return val.toString().padStart(2);
+    return val.toString().padStart(2, "0");
   }
   const second = val % 60;
   let minutes = Math.floor(val / 60);

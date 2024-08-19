@@ -161,8 +161,11 @@ export default function Root() {
         value={{
           ...sudokuContext,
           switchMode,
-          updateElapsedTime: (val: number) =>
-            setSudokuContext((ctx) => ({ ...ctx, elapsedTime: val })),
+          updateElapsedTime: () =>
+            setSudokuContext((ctx) => ({
+              ...ctx,
+              elapsedTime: ctx.elapsedTime + 1,
+            })),
           togglePause: () =>
             setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause })),
         }}

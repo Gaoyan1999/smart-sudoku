@@ -26,7 +26,6 @@ export function initSudoKuContext(): SudokuDataContext {
 }
 
 export function initSudokuData(): SudokuData {
-  console.log("initSudokuData");
   // TODO: mock it temporarily
   const data = {
     mission:
