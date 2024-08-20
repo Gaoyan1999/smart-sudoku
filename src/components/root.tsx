@@ -4,33 +4,43 @@ import {
   useEffect,
   useState,
 } from "react";
-import {SudoKuContext, SudokuDataContext} from "../types/sudoku.ts";
+import { SudoKuContext, SudokuDataContext } from "../types/sudoku.ts";
 import { noop, remove, throttle } from "lodash";
 import { initSudoKuContext, initSudokuData } from "./sudoku.ts";
-import {
-  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
-  LOCAL_STORAGE_KEY_SUDOKU_DATA,
-} from "../const.ts";
 import { getRelateCells } from "../utils/location.ts";
 import { ToolArea } from "./tool-area.tsx";
 import { MainPlayground } from "./main-playground.tsx";
 import { fillAllCandidate } from "../utils/cell-calculation.ts";
 import { InformationBar } from "./Information-bar.tsx";
+import {
+  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  LOCAL_STORAGE_KEY_SUDOKU_DATA,
+} from "../const.ts";
 
-export const SudokuContext = createContext<
-  SudoKuContext & { switchMode: () => void }
->({
+export const SudokuContext = createContext<SudoKuContext>({
   mode: "normal",
   isPause: false,
+  elapsedTime: 0,
   switchMode: noop,
   togglePause: noop,
+  updateElapsedTime: noop,
 });
 
 export default function Root() {
   const [sudokuContext, setSudokuContext] =
-    useState<SudokuDataContext>(initSudoKuContext());
+    useState<SudokuDataContext>(initSudoKuContext);
+  const [sudokuData, setSudokuDataInternal] = useState(initSudokuData);
 
-  const [sudokuData, setSudokuData] = useState(initSudokuData());
+  function setSudokuData(...arg: Parameters<typeof setSudokuDataInternal>) {
+    if (sudokuContext.isPause) {
+      return;
+    }
+    return setSudokuDataInternal(...arg);
+  }
+
+  function togglePause() {
+    setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause }));
+  }
 
   useEffect(() => {
     localStorage.setItem(
@@ -61,12 +71,17 @@ export default function Root() {
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
-    // mode control and some shortcut
-    if (code === "KeyX") {
-      switchMode();
+    event.preventDefault();
+    if (sudokuContext.isPause && code !== "Space") {
       return;
     }
-    if (code === "KeyC") {
+    // mode control and some shortcut
+    if (code === "Space") {
+      togglePause();
+    }
+    if (code === "KeyX") {
+      switchMode();
+    } else if (code === "KeyC") {
       fillAddCandidates();
     }
 
@@ -161,15 +176,19 @@ export default function Root() {
       <SudokuContext.Provider
         value={{
           ...sudokuContext,
-          switchMode: switchMode,
-          togglePause: () =>
-            setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause })),
+          switchMode,
+          updateElapsedTime: () =>
+            setSudokuContext((ctx) => ({
+              ...ctx,
+              elapsedTime: ctx.elapsedTime + 1,
+            })),
+          togglePause,
         }}
       >
         <div className="w-4/12">
           <ToolArea showAllCandidates={fillAddCandidates} />
         </div>
-        <div className="w-4/12">
+        <div className="w-auto">
           <InformationBar />
           <MainPlayground
             matrix={sudokuData.matrix}

@@ -7,13 +7,20 @@
   @apply w-12 h-12 m-auto text-center p-0;
   @apply border-solid border-neutral-400 border-[0.5px];
   .normal-mode-cell {
-    @apply w-12 h-12;
+    @apply w-full h-full;
     line-height: 48px;
   }
   .noting-cell {
-    @apply grid  w-full h-full overflow-hidden;
+    @apply grid  w-full h-full;
     @apply text-xs text-neutral-500;
     grid-template-rows: repeat(3, 16px);
     grid-template-columns: repeat(3, 16px);
   }
+}
+
+.pause-mask {
+  @apply absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
 }

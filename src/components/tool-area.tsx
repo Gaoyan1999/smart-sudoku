@@ -18,7 +18,6 @@ export function ToolArea({
   const { mode, switchMode } = useContext(SudokuContext);
 
   function handleModeChanged(_: React.MouseEvent<HTMLElement>, val: string) {
-    console.log("val", val);
     if (val) {
       switchMode();
     }

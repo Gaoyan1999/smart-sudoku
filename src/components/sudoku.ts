@@ -1,7 +1,4 @@
-import {
-  SudokuData,
-  SudokuDataContext,
-} from "../types/sudoku.ts";
+import { SudokuData, SudokuDataContext } from "../types/sudoku.ts";
 import { isEmpty } from "lodash";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
