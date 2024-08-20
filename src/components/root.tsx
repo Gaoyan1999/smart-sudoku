@@ -29,7 +29,18 @@ export const SudokuContext = createContext<SudoKuContext>({
 export default function Root() {
   const [sudokuContext, setSudokuContext] =
     useState<SudokuDataContext>(initSudoKuContext);
-  const [sudokuData, setSudokuData] = useState(initSudokuData);
+  const [sudokuData, setSudokuDataInternal] = useState(initSudokuData);
+
+  function setSudokuData(...arg: Parameters<typeof setSudokuDataInternal>) {
+    if (sudokuContext.isPause) {
+      return;
+    }
+    return setSudokuDataInternal(...arg);
+  }
+
+  function togglePause() {
+    setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause }));
+  }
 
   useEffect(() => {
     localStorage.setItem(
@@ -60,12 +71,17 @@ export default function Root() {
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
-    // mode control and some shortcut
-    if (code === "KeyX") {
-      switchMode();
+    event.preventDefault();
+    if (sudokuContext.isPause && code !== "Space") {
       return;
     }
-    if (code === "KeyC") {
+    // mode control and some shortcut
+    if (code === "Space") {
+      togglePause();
+    }
+    if (code === "KeyX") {
+      switchMode();
+    } else if (code === "KeyC") {
       fillAddCandidates();
     }
 
@@ -166,14 +182,13 @@ export default function Root() {
               ...ctx,
               elapsedTime: ctx.elapsedTime + 1,
             })),
-          togglePause: () =>
-            setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause })),
+          togglePause,
         }}
       >
         <div className="w-4/12">
           <ToolArea showAllCandidates={fillAddCandidates} />
         </div>
-        <div className="w-4/12">
+        <div className="w-auto">
           <InformationBar />
           <MainPlayground
             matrix={sudokuData.matrix}

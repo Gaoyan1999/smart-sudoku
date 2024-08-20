@@ -1,16 +1,14 @@
 import { useContext, useEffect } from "react";
-
 import { secondToHourAndMinutes } from "../utils/common.ts";
 import { SudokuContext } from "./root.tsx";
 import { Pause, PlayArrow } from "@mui/icons-material";
+import { grey } from "@mui/material/colors";
 
 export function InformationBar() {
   const { elapsedTime, updateElapsedTime, isPause, togglePause } =
     useContext(SudokuContext);
 
   useEffect(() => {
-    console.log("use effect");
-    // const interval = setInterval(() => getTime(), 1000);
     if (isPause) {
       return;
     }
@@ -19,24 +17,22 @@ export function InformationBar() {
     }, 1000);
     return () => clearInterval(interval);
   }, [isPause, updateElapsedTime]);
-  // const [elapsedTime, setElapsedTime] = useState(0);
-  // const { elapsedTime, updateElapsedTime } = useContext(SudokuContext);
-  // const intervalRef = useRef<{ intervalNumber: number; isCalled: boolean }>({
-  //   intervalNumber: -1,
-  //   isCalled: false,
-  // });
-  //
 
   return (
     <div className="flex justify-between">
       <span>Difficulty:</span>
       <div className="flex items-center cursor-pointer">
         {isPause ? (
-          <PlayArrow onClick={togglePause} />
+          <PlayArrow onClick={togglePause} sx={{ color: grey[800] }} />
         ) : (
-          <Pause onClick={togglePause} />
+          <Pause
+            onClick={togglePause}
+            sx={{ color: grey[800] }}
+          />
         )}
-        <span className="ml-2 w-12">{secondToHourAndMinutes(elapsedTime)}</span>
+        <span className="ml-2 w-12 font-semibold text-neutral-600 text-neutral-600">
+          {secondToHourAndMinutes(elapsedTime)}
+        </span>
       </div>
     </div>
   );
