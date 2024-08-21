@@ -11,11 +11,11 @@ import { getRelateCells } from "../utils/location.ts";
 import { ToolArea } from "./tool-area.tsx";
 import { MainPlayground } from "./main-playground.tsx";
 import { fillAllCandidate } from "../utils/cell-calculation.ts";
-import { InformationBar } from "./information-bar.tsx";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
   LOCAL_STORAGE_KEY_SUDOKU_DATA,
 } from "../const.ts";
+import { InformationBar } from "./information-bar.tsx";
 
 export const SudokuContext = createContext<SudoKuContext>({
   mode: "normal",

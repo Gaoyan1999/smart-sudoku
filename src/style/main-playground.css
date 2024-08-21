@@ -4,14 +4,14 @@
 }
 
 .sudoku-cell {
-  @apply w-12 h-12 m-auto text-center p-0;
+  @apply m-auto text-center p-0 w-auto;
   @apply border-solid border-neutral-400 border-[0.5px];
   .normal-mode-cell {
-    @apply w-full h-full;
+    @apply w-12 h-12;
     line-height: 48px;
   }
   .noting-cell {
-    @apply grid  w-full h-full;
+    @apply grid  w-12 h-12;
     @apply text-xs text-neutral-500;
     grid-template-rows: repeat(3, 16px);
     grid-template-columns: repeat(3, 16px);

@@ -22,13 +22,11 @@ export function InformationBar() {
     <div className="flex justify-between">
       <span>Difficulty:</span>
       <div className="flex items-center cursor-pointer">
+        {/*<Replay   sx={{ color: grey[800] }} />*/}
         {isPause ? (
           <PlayArrow onClick={togglePause} sx={{ color: grey[800] }} />
         ) : (
-          <Pause
-            onClick={togglePause}
-            sx={{ color: grey[800] }}
-          />
+          <Pause onClick={togglePause} sx={{ color: grey[800] }} />
         )}
         <span className="ml-2 w-12 font-semibold text-neutral-600 text-neutral-600">
           {secondToHourAndMinutes(elapsedTime)}
