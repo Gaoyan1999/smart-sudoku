@@ -13,7 +13,7 @@ export function MainPlayground({
   selectedPosition,
   setPosition,
 }: SudokuData & { setPosition: (rowIndex: number, colIndex: number) => void }) {
-  const { isPause } = useContext(SudokuContext);
+  const { isPause, togglePause } = useContext(SudokuContext);
 
   const selectedValue = getSelectCell()?.value;
 
@@ -36,7 +36,7 @@ export function MainPlayground({
   return (
     <div className="relative">
       {isPause ? (
-        <div className="pause-mask">
+        <div className="pause-mask cursor-pointer" onClick={togglePause}>
           <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: "60px" }} />
         </div>
       ) : null}

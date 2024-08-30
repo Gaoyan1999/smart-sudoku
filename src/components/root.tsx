@@ -11,11 +11,11 @@ import { getRelateCells } from "../utils/location.ts";
 import { ToolArea } from "./tool-area.tsx";
 import { MainPlayground } from "./main-playground.tsx";
 import { fillAllCandidate } from "../utils/cell-calculation.ts";
-import { InformationBar } from "./information-bar.tsx";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
   LOCAL_STORAGE_KEY_SUDOKU_DATA,
 } from "../const.ts";
+import { InformationBar } from "./information-bar.tsx";
 
 export const SudokuContext = createContext<SudoKuContext>({
   mode: "normal",
@@ -38,10 +38,6 @@ export default function Root() {
     return setSudokuDataInternal(...arg);
   }
 
-  function togglePause() {
-    setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause }));
-  }
-
   useEffect(() => {
     localStorage.setItem(
       LOCAL_STORAGE_KEY_SUDOKU_DATA,
@@ -55,17 +51,85 @@ export default function Root() {
     );
   });
 
+  // ------------------------ START: sudoku data operation -------------------------------
+  function fillAllCandidates() {
+    setSudokuData((data) => ({
+      ...data,
+      matrix: fillAllCandidate(sudokuData.matrix),
+    }));
+  }
+
+  function togglePause() {
+    setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause }));
+  }
+
+  function setPosition(rowIndex: number, colIndex: number) {
+    setSudokuData({
+      ...sudokuData,
+      selectedPosition: { rowIndex, colIndex },
+    });
+  }
+
+  function setCellValue(rowIndex: number, colIndex: number, val: number) {
+    const matrix = sudokuData.matrix;
+    const cell = matrix[rowIndex][colIndex];
+    if (cell.type !== "unknown" || val < 0 || val > 9) {
+      return;
+    }
+    cell.value = val;
+    setSudokuData({ ...sudokuData, matrix });
+  }
+
+  function setNotingCandidates(
+    rowIndex: number,
+    colIndex: number,
+    candidateNumber: number,
+  ) {
+    const matrix = sudokuData.matrix;
+    const cell = matrix[rowIndex][colIndex];
+    if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
+      return;
+    }
+    if (candidateNumber === 0) {
+      cell.notingCandidates = [];
+      setSudokuData({ ...sudokuData, matrix });
+      return;
+    }
+
+    const { notingCandidates } = cell;
+    const idx = notingCandidates.findIndex((num) => num === candidateNumber);
+    if (idx === -1) {
+      notingCandidates.push(candidateNumber);
+    } else {
+      notingCandidates.splice(idx, 1);
+    }
+    setSudokuData({ ...sudokuData, matrix });
+  }
+
+  function resetSudoku() {
+    setSudokuData((data) => {
+      data.matrix.forEach((row) => {
+        row.forEach((col) => {
+          if (col.type !== "known") {
+            col.value = 0;
+            col.notingCandidates = [];
+          }
+        });
+      });
+
+      return { ...data, selectedPosition: undefined };
+    });
+    setSudokuContext((ctx) => {
+      return { ...ctx, elapsedTime: 0, isPause: false, mode: "normal" };
+    });
+  }
+
+  // ------------------------ END: sudoku data operation -------------------------------
+
   function switchMode() {
     setSudokuContext((ctx) => ({
       ...ctx,
       mode: ctx.mode === "normal" ? "noting" : "normal",
-    }));
-  }
-
-  function fillAddCandidates() {
-    setSudokuData((data) => ({
-      ...data,
-      matrix: fillAllCandidate(sudokuData.matrix),
     }));
   }
 
@@ -82,7 +146,7 @@ export default function Root() {
     if (code === "KeyX") {
       switchMode();
     } else if (code === "KeyC") {
-      fillAddCandidates();
+      fillAllCandidates();
     }
 
     // Cell control
@@ -116,55 +180,11 @@ export default function Root() {
         getRelateCells({ rowIndex, colIndex }, matrix).filter((cell) => {
           remove(cell.notingCandidates, (value) => value === num);
         });
-        setSudokuData((data) => ({
-          ...data,
-          matrix: fillAllCandidate(sudokuData.matrix),
-        }));
       } else {
         setNotingCandidates(rowIndex, colIndex, num);
       }
     }
   }, 100);
-  function setPosition(rowIndex: number, colIndex: number) {
-    setSudokuData({
-      ...sudokuData,
-      selectedPosition: { rowIndex, colIndex },
-    });
-  }
-  function setCellValue(rowIndex: number, colIndex: number, val: number) {
-    const matrix = sudokuData.matrix;
-    const cell = matrix[rowIndex][colIndex];
-    if (cell.type !== "unknown" || val < 0 || val > 9) {
-      return;
-    }
-    cell.value = val;
-    setSudokuData({ ...sudokuData, matrix });
-  }
-  function setNotingCandidates(
-    rowIndex: number,
-    colIndex: number,
-    candidateNumber: number,
-  ) {
-    const matrix = sudokuData.matrix;
-    const cell = matrix[rowIndex][colIndex];
-    if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
-      return;
-    }
-    if (candidateNumber === 0) {
-      cell.notingCandidates = [];
-      setSudokuData({ ...sudokuData, matrix });
-      return;
-    }
-
-    const { notingCandidates } = cell;
-    const idx = notingCandidates.findIndex((num) => num === candidateNumber);
-    if (idx === -1) {
-      notingCandidates.push(candidateNumber);
-    } else {
-      notingCandidates.splice(idx, 1);
-    }
-    setSudokuData({ ...sudokuData, matrix });
-  }
 
   return (
     <div
@@ -186,10 +206,10 @@ export default function Root() {
         }}
       >
         <div className="w-4/12">
-          <ToolArea showAllCandidates={fillAddCandidates} />
+          <ToolArea showAllCandidates={fillAllCandidates} />
         </div>
         <div className="w-auto">
-          <InformationBar />
+          <InformationBar resetSudoku={resetSudoku} />
           <MainPlayground
             matrix={sudokuData.matrix}
             selectedPosition={sudokuData.selectedPosition}
