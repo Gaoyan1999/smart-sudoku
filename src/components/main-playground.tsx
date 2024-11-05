@@ -82,6 +82,6 @@ export function MainPlayground({
  *
  *
  * improvement:
- * 1. Add animation when moving the selected cell.
+ * 1. Add animation when moving the selected cell
  * 2. save to local storage
  */
