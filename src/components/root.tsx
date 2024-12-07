@@ -16,10 +16,13 @@ import {
   LOCAL_STORAGE_KEY_SUDOKU_DATA,
 } from "../const.ts";
 import { InformationBar } from "./information-bar.tsx";
+import { isSudokuFinished } from "../utils/common.ts";
+import { CongratsModal } from "./congrats-modal";
 
 export const SudokuContext = createContext<SudoKuContext>({
   mode: "normal",
   isPause: false,
+  isFinished: false,
   elapsedTime: 0,
   switchMode: noop,
   togglePause: noop,
@@ -30,6 +33,7 @@ export default function Root() {
   const [sudokuContext, setSudokuContext] =
     useState<SudokuDataContext>(initSudoKuContext);
   const [sudokuData, setSudokuDataInternal] = useState(initSudokuData);
+  const [showCongrats, setShowCongrats] = useState(false);
 
   function setSudokuData(...arg: Parameters<typeof setSudokuDataInternal>) {
     if (sudokuContext.isPause) {
@@ -115,12 +119,11 @@ export default function Root() {
             col.notingCandidates = [];
           }
         });
-      });
-
+      });      
       return { ...data, selectedPosition: undefined };
     });
     setSudokuContext((ctx) => {
-      return { ...ctx, elapsedTime: 0, isPause: false, mode: "normal" };
+      return { ...ctx, elapsedTime: 0, isPause: false, isFinished: false, mode: "normal" };
     });
   }
 
@@ -133,9 +136,8 @@ export default function Root() {
     }));
   }
 
-  const handleKeyDown: KeyboardEventHandler = throttle((event) => {
-    const code = event.code;
-    event.preventDefault();
+  const handleKeyDown: KeyboardEventHandler = throttle((event) => {    
+    const code = event.code;    
     if (sudokuContext.isPause && code !== "Space") {
       return;
     }
@@ -167,7 +169,12 @@ export default function Root() {
     const targetCell = matrix[rowIndex][colIndex];
     if (targetCell.type !== "unknown") {
       return;
-    } else if (code === "Backspace") {
+    }
+    if(sudokuContext.isFinished) {
+      return;
+    }
+    // operation for cell value
+    if (code === "Backspace") {
       setCellValue(rowIndex, colIndex, 0);
       setNotingCandidates(rowIndex, colIndex, 0);
     }
@@ -176,6 +183,13 @@ export default function Root() {
       const num = +code[5];
       if (sudokuContext.mode === "normal") {
         setCellValue(rowIndex, colIndex, num);
+        // check the sudoku is finished
+        if (isSudokuFinished(matrix)) {                    
+          setSudokuContext((ctx) => ({ ...ctx, isFinished: true }));
+          setTimeout(() => {
+            setShowCongrats(true);
+          }, 100);
+        }
         // remove the candidate numbers in related cells.
         getRelateCells({ rowIndex, colIndex }, matrix).filter((cell) => {
           remove(cell.notingCandidates, (value) => value === num);
@@ -188,7 +202,7 @@ export default function Root() {
 
   return (
     <div
-      className="p-4 flex h-full"
+      className="p-4 flex h-full relative"
       style={{ outline: "none" }}
       tabIndex={1}
       onKeyDown={handleKeyDown}
@@ -217,6 +231,11 @@ export default function Root() {
           />
         </div>
       </SudokuContext.Provider>
+      
+      <CongratsModal 
+        isOpen={showCongrats} 
+        onClose={() => setShowCongrats(false)} 
+      />
     </div>
   );
 }
