@@ -17,6 +17,7 @@ export type SudoKuContext = SudokuDataContext & SudokuContextUpdateFunc;
 export type SudokuDataContext = {
   mode: "normal" | "noting";
   isPause: boolean;
+  isFinished: boolean;
   // unit: second
   elapsedTime: number;
 };
