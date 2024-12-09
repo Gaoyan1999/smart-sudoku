@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { SudokuContext } from "../../context/sudoku-context";
+import { DefaultSudokuContext } from "../../context/sudoku-context";
 import {
   ToggleButton,
   ToggleButtonGroup,
@@ -15,7 +15,7 @@ export function ToolArea({
 }: {
   showAllCandidates: () => void;
 }) {
-  const { mode, switchMode } = useContext(SudokuContext);
+  const { mode, switchMode } = useContext(DefaultSudokuContext);
 
   function handleModeChanged(_: React.MouseEvent<HTMLElement>, val: string) {
     if (val) {

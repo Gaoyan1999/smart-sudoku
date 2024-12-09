@@ -4,7 +4,7 @@ import { isRelatedCell } from "../../utils/location";
 import { SudokuData } from "../../types/sudoku";
 import { NotingCell } from "./noting-cell";
 import { useContext } from "react";
-import { SudokuContext } from "../../context/sudoku-context";
+import { DefaultSudokuContext } from "../../context/sudoku-context";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { blue } from "@mui/material/colors";
 
@@ -13,7 +13,7 @@ export function MainPlayground({
   selectedPosition,
   setPosition,
 }: SudokuData & { setPosition: (rowIndex: number, colIndex: number) => void }) {
-  const { isPause, togglePause } = useContext(SudokuContext);
+  const { isPause, togglePause } = useContext(DefaultSudokuContext);
 
   const selectedValue = getSelectCell()?.value;
 

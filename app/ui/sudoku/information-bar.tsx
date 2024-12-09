@@ -1,12 +1,12 @@
 import { useContext, useEffect } from "react";
 import { secondToHourAndMinutes } from "../../utils/common";
-import { SudokuContext } from "../../context/sudoku-context";
+import { DefaultSudokuContext } from "../../context/sudoku-context";
 import { Pause, PlayArrow, Replay } from "@mui/icons-material";
 import { grey } from "@mui/material/colors";
 
 export function InformationBar({ resetSudoku }: { resetSudoku: () => void }) {
   const { elapsedTime, updateElapsedTime, isPause, isFinished, togglePause } =
-    useContext(SudokuContext);
+    useContext(DefaultSudokuContext);
 
   useEffect(() => {
     if (isPause || isFinished) {

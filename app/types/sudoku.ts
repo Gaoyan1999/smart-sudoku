@@ -12,7 +12,7 @@ export type SudokuData = {
   selectedPosition?: { rowIndex: number; colIndex: number };
 };
 
-export type SudoKuContext = SudokuDataContext & SudokuContextUpdateFunc;
+export type SudokuContext = SudokuDataContext & SudokuContextUpdateFunc;
 
 export type SudokuDataContext = {
   mode: "normal" | "noting";

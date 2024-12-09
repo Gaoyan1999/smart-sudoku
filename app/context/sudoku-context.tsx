@@ -1,13 +1,11 @@
 import { createContext } from "react";
 import { noop } from "lodash";
-import { SudoKuContext } from "../types/sudoku";
+import { SudokuContext } from "../types/sudoku";
+import { getDefaultSudokuContext } from "../sudoku/sudoku";
 
-export const SudokuContext = createContext<SudoKuContext>({
-  mode: "normal",
-  isPause: false,
-  isFinished: false,
-  elapsedTime: 0,
+export const DefaultSudokuContext = createContext<SudokuContext>({
+  ...getDefaultSudokuContext(),
   switchMode: noop,
   togglePause: noop,
   updateElapsedTime: noop,
-}); 
+});

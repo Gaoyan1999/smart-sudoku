@@ -14,7 +14,7 @@ import {
 import { InformationBar } from "../ui/sudoku/information-bar";
 import { isSudokuFinished } from "../utils/common";
 import { CongratsModal } from "../ui/sudoku/congrats-modal";
-import { SudokuContext } from "../context/sudoku-context";
+import { DefaultSudokuContext } from "../context/sudoku-context";
 
 export default function Page() {
   const [sudokuContext, setSudokuContext] = useState<SudokuDataContext>(
@@ -223,7 +223,7 @@ export default function Page() {
       tabIndex={1}
       onKeyDown={handleKeyDown}
     >
-      <SudokuContext.Provider
+      <DefaultSudokuContext.Provider
         value={{
           ...sudokuContext,
           switchMode,
@@ -246,7 +246,7 @@ export default function Page() {
             setPosition={setPosition}
           />
         </div>
-      </SudokuContext.Provider>
+      </DefaultSudokuContext.Provider>
 
       <CongratsModal
         isOpen={showCongrats}
