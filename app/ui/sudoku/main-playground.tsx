@@ -4,7 +4,7 @@ import { isRelatedCell } from "../../utils/location";
 import { SudokuData } from "../../types/sudoku";
 import { NotingCell } from "./noting-cell";
 import { useContext } from "react";
-import { SudokuContext } from "../../sudoku/page";
+import { SudokuContext } from "../../context/sudoku-context";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { blue } from "@mui/material/colors";
 

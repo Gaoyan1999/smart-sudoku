@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { secondToHourAndMinutes } from "../../utils/common";
-import { SudokuContext } from "../../sudoku/page";
+import { SudokuContext } from "../../context/sudoku-context";
 import { Pause, PlayArrow, Replay } from "@mui/icons-material";
 import { grey } from "@mui/material/colors";
 
