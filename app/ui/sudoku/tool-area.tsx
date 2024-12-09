@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { SudokuContext } from "../../sudoku/page";
+import { SudokuContext } from "../../context/sudoku-context";
 import {
   ToggleButton,
   ToggleButtonGroup,

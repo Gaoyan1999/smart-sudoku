@@ -1,13 +1,12 @@
 "use client";
 import {
-    createContext,
     KeyboardEventHandler,
     useEffect,
     useState,
   } from "react";
-  import { SudoKuContext, SudokuDataContext } from "../types/sudoku";
-  import { noop, remove, throttle } from "lodash";
-  import { initSudoKuContext, initSudokuData } from "./sudoku";
+  import {  SudokuDataContext } from "../types/sudoku";
+  import { remove, throttle } from "lodash";
+  import { getDefaultSudokuContext, getDefaultSudokuData } from "./sudoku";
   import { getRelateCells } from "../utils/location";
   import { ToolArea } from "../ui/sudoku/tool-area";
   import { MainPlayground } from "../ui/sudoku/main-playground";
@@ -19,21 +18,12 @@ import {
   import { InformationBar } from "../ui/sudoku/information-bar";
   import { isSudokuFinished } from "../utils/common";
   import { CongratsModal } from '../ui/sudoku/congrats-modal';
-  
-  export const SudokuContext = createContext<SudoKuContext>({
-    mode: "normal",
-    isPause: false,
-    isFinished: false,
-    elapsedTime: 0,
-    switchMode: noop,
-    togglePause: noop,
-    updateElapsedTime: noop,
-  });
+  import { SudokuContext } from "../context/sudoku-context";
   
   export default function Page() {
     const [sudokuContext, setSudokuContext] =
-      useState<SudokuDataContext>(initSudoKuContext);
-    const [sudokuData, setSudokuDataInternal] = useState(initSudokuData);
+      useState<SudokuDataContext>(getDefaultSudokuContext());
+    const [sudokuData, setSudokuDataInternal] = useState(getDefaultSudokuData());
     const [showCongrats, setShowCongrats] = useState(false);
   
     function setSudokuData(...arg: Parameters<typeof setSudokuDataInternal>) {
@@ -42,14 +32,38 @@ import {
       }
       return setSudokuDataInternal(...arg);
     }
+
+  // 初始化数据
+  useEffect(() => {
+    const savedContext = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_CONTEXT);
+    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_DATA);
+
+    if (savedContext) {
+      try {
+        setSudokuContext(JSON.parse(savedContext));
+      } catch (e) {
+        console.error('Failed to parse saved context');
+      }
+    }
+
+    if (savedData) {
+      try {
+        setSudokuDataInternal(JSON.parse(savedData));
+      } catch (e) {
+        console.error('Failed to parse saved data');
+      }
+    }
+  }, []);
+
   
-    useEffect(() => {
+    useEffect(() => {      
       localStorage.setItem(
         LOCAL_STORAGE_KEY_SUDOKU_DATA,
         JSON.stringify(sudokuData),
       );
     });
     useEffect(() => {
+      
       localStorage.setItem(
         LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
         JSON.stringify(sudokuContext),
