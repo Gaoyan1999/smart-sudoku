@@ -18,6 +18,8 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
     "@types/lodash": "^4.17.7",
     "lodash": "^4.17.21",
     "next": "^15.0.4",
