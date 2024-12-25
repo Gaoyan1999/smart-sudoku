@@ -9,8 +9,8 @@ export function fillAllCandidate(matrix: SudokuData["matrix"]) {
         uniq(
           getRelateCells({ rowIndex, colIndex }, matrix)
             .filter((cell) => cell.value !== 0)
-            .map((cell) => cell.value),
-        ),
+            .map((cell) => cell.value)
+        )
       );
     });
   });
@@ -54,4 +54,14 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
   });
 
   return result;
+}
+
+export function isSudokuFinished(matrix: SudokuCell[][]) {
+  return matrix.every((row) =>
+    row.every(
+      (cell) =>
+        cell.type === "known" ||
+        (cell.type === "unknown" && cell.value === cell.realAnswer)
+    )
+  );
 }

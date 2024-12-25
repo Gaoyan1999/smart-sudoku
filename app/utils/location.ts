@@ -1,10 +1,4 @@
-// Define a type for position
-import { SudokuCell } from "../types/sudoku";
-
-export type Position = {
-  rowIndex: number;
-  colIndex: number;
-};
+import { Position, SudokuCell } from "../types/sudoku";
 
 export function isRelatedCell(targetA: Position, targetB: Position): boolean {
   // Check if either targetA or targetB is not defined
