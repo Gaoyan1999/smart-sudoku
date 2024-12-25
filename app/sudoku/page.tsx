@@ -1,97 +1,117 @@
 "use client";
-import { KeyboardEventHandler, useEffect, useState } from "react";
-import { SudokuDataContext } from "../types/sudoku";
+import { KeyboardEventHandler, useState } from "react";
+import { Sudoku } from "../types/sudoku";
 import { remove, throttle } from "lodash";
-import { getDefaultSudokuContext, getDefaultSudokuData } from "./sudoku";
+import { getDefaultSudoku } from "./sudoku";
 import { getRelateCells } from "../utils/location";
 import { ToolArea } from "../ui/sudoku/tool-area";
 import { MainPlayground } from "../ui/sudoku/main-playground";
 import { fillAllCandidate } from "../utils/sudoku-utils";
-import {
-  LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
-  LOCAL_STORAGE_KEY_SUDOKU_DATA,
-} from "../const";
 import { InformationBar } from "../ui/sudoku/information-bar";
 import { isSudokuFinished } from "../utils/sudoku-utils";
 import { CongratsModal } from "../ui/sudoku/congrats-modal";
 import { DefaultSudokuContext } from "../context/sudoku-context";
 
 export default function Page() {
-  const [sudokuContext, setSudokuContext] = useState<SudokuDataContext>(
-    getDefaultSudokuContext()
-  );
-  const [sudokuData, setSudokuDataInternal] = useState(getDefaultSudokuData());
+  const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
+
   const [showCongrats, setShowCongrats] = useState(false);
 
-  function setSudokuData(...arg: Parameters<typeof setSudokuDataInternal>) {
-    if (sudokuContext.isPause) {
+  function setSudoku(...arg: Parameters<typeof setSudokuInternal>) {
+    if (sudoku.context.isPause) {
       return;
     }
-    return setSudokuDataInternal(...arg);
+    setSudokuInternal(...arg);
   }
 
-  // init sudoku data
-  useEffect(() => {
-    const savedContext = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_CONTEXT);
-    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_DATA);
+  // // init sudoku data
+  // useEffect(() => {
+  //   const savedContext = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_CONTEXT);
+  //   const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_DATA);
 
-    if (savedContext) {
-      try {
-        setSudokuContext(JSON.parse(savedContext));
-      } catch (e) {
-        console.error("Failed to parse saved context");
-      }
-    }
+  //   if (savedContext) {
+  //     try {
+  //       setSudokuContext(JSON.parse(savedContext));
+  //     } catch (e) {
+  //       console.error("Failed to parse saved context");
+  //     }
+  //   }
 
-    if (savedData) {
-      try {
-        setSudokuDataInternal(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Failed to parse saved data");
-      }
-    }
-  }, []);
+  //   if (savedData) {
+  //     try {
+  //       setSudokuDataInternal(JSON.parse(savedData));
+  //     } catch (e) {
+  //       console.error("Failed to parse saved data");
+  //     }
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_SUDOKU_DATA,
-      JSON.stringify(sudokuData)
-    );
-  });
-  useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
-      JSON.stringify(sudokuContext)
-    );
-  });
+  // useEffect(() => {
+  //   localStorage.setItem(
+  //     LOCAL_STORAGE_KEY_SUDOKU_DATA,
+  //     JSON.stringify(sudokuData)
+  //   );
+  // });
+  // useEffect(() => {
+  //   localStorage.setItem(
+  //     LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
+  //     JSON.stringify(sudokuContext)
+  //   );
+  // });
 
   // ------------------------ START: sudoku data operation -------------------------------
   function fillAllCandidates() {
-    setSudokuData((data) => ({
-      ...data,
-      matrix: fillAllCandidate(sudokuData.matrix),
-    }));
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        data: {
+          ...sudoku.data,
+          matrix: fillAllCandidate(sudoku.data.matrix),
+        },
+      };
+    });
   }
 
   function togglePause() {
-    setSudokuContext((ctx) => ({ ...ctx, isPause: !ctx.isPause }));
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        context: {
+          ...sudoku.context,
+          isPause: !sudoku.context.isPause,
+        },
+      };
+    });
   }
 
   function setPosition(rowIndex: number, colIndex: number) {
-    setSudokuData({
-      ...sudokuData,
-      selectedPosition: { rowIndex, colIndex },
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        context: {
+          ...sudoku.context,
+          selectedPosition: { rowIndex, colIndex },
+        },
+      };
     });
   }
 
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
-    const matrix = sudokuData.matrix;
+    const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
     if (cell.type !== "unknown" || val < 0 || val > 9) {
       return;
     }
     cell.value = val;
-    setSudokuData({ ...sudokuData, matrix });
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        data: {
+          ...sudoku.data,
+          matrix,
+        },
+      };
+    });
   }
 
   function setNotingCandidates(
@@ -99,14 +119,22 @@ export default function Page() {
     colIndex: number,
     candidateNumber: number
   ) {
-    const matrix = sudokuData.matrix;
+    const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
     if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
       return;
     }
     if (candidateNumber === 0) {
       cell.notingCandidates = [];
-      setSudokuData({ ...sudokuData, matrix });
+      setSudoku((sudoku) => {
+        return {
+          ...sudoku,
+          data: {
+            ...sudoku.data,
+            matrix,
+          },
+        };
+      });
       return;
     }
 
@@ -117,12 +145,21 @@ export default function Page() {
     } else {
       notingCandidates.splice(idx, 1);
     }
-    setSudokuData({ ...sudokuData, matrix });
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        data: {
+          ...sudoku.data,
+          matrix,
+        },
+      };
+    });
   }
 
   function resetSudoku() {
-    setSudokuData((data) => {
-      data.matrix.forEach((row) => {
+    setSudoku((sudoku) => {
+      const matrix = sudoku.data.matrix;
+      matrix.forEach((row) => {
         row.forEach((col) => {
           if (col.type !== "known") {
             col.value = 0;
@@ -130,15 +167,15 @@ export default function Page() {
           }
         });
       });
-      return { ...data, selectedPosition: undefined };
-    });
-    setSudokuContext((ctx) => {
       return {
-        ...ctx,
-        elapsedTime: 0,
-        isPause: false,
-        isFinished: false,
-        mode: "normal",
+        ...sudoku,
+        context: {
+          selectedPosition: undefined,
+          elapsedTime: 0,
+          isPause: false,
+          isFinished: false,
+          mode: "normal",
+        },
       };
     });
   }
@@ -146,15 +183,20 @@ export default function Page() {
   // ------------------------ END: sudoku data operation -------------------------------
 
   function switchMode() {
-    setSudokuContext((ctx) => ({
-      ...ctx,
-      mode: ctx.mode === "normal" ? "noting" : "normal",
-    }));
+    setSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        context: {
+          ...sudoku.context,
+          mode: sudoku.context.mode === "normal" ? "noting" : "normal",
+        },
+      };
+    });
   }
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
-    if (sudokuContext.isPause && code !== "Space") {
+    if (sudoku.context.isPause && code !== "Space") {
       return;
     }
     // mode control and some shortcut
@@ -168,10 +210,18 @@ export default function Page() {
     }
 
     // Cell control
-    if (!sudokuData.selectedPosition) return;
-    const { rowIndex, colIndex } = sudokuData.selectedPosition;
+    if (!sudoku.context.selectedPosition) return;
+    const { rowIndex, colIndex } = sudoku.context.selectedPosition;
     if (code === "Escape") {
-      setSudokuData({ ...sudokuData, selectedPosition: undefined });
+      setSudoku((sudoku) => {
+        return {
+          ...sudoku,
+          context: {
+            ...sudoku.context,
+            selectedPosition: undefined,
+          },
+        };
+      });
     } else if (code === "ArrowLeft") {
       setPosition(rowIndex, colIndex - 1 < 0 ? 0 : colIndex - 1);
     } else if (code === "ArrowRight") {
@@ -181,12 +231,12 @@ export default function Page() {
     } else if (code === "ArrowDown") {
       setPosition(rowIndex + 1 > 8 ? 8 : rowIndex + 1, colIndex);
     }
-    const matrix = sudokuData.matrix;
+    const matrix = sudoku.data.matrix;
     const targetCell = matrix[rowIndex][colIndex];
     if (targetCell.type !== "unknown") {
       return;
     }
-    if (sudokuContext.isFinished) {
+    if (sudoku.context.isFinished) {
       return;
     }
     // operation for cell value
@@ -197,11 +247,14 @@ export default function Page() {
     const is1To9 = /^Digit[1-9]$/;
     if (is1To9.test(code)) {
       const num = +code[5];
-      if (sudokuContext.mode === "normal") {
+      if (sudoku.context.mode === "normal") {
         setCellValue(rowIndex, colIndex, num);
         // check the sudoku is finished
         if (isSudokuFinished(matrix)) {
-          setSudokuContext((ctx) => ({ ...ctx, isFinished: true }));
+          setSudoku((sudoku) => ({
+            ...sudoku,
+            context: { ...sudoku.context, isFinished: true },
+          }));
           setTimeout(() => {
             setShowCongrats(true);
           }, 100);
@@ -225,12 +278,15 @@ export default function Page() {
     >
       <DefaultSudokuContext.Provider
         value={{
-          ...sudokuContext,
+          ...sudoku.context,
           switchMode,
           updateElapsedTime: () =>
-            setSudokuContext((ctx) => ({
-              ...ctx,
-              elapsedTime: ctx.elapsedTime + 1,
+            setSudoku((sudoku) => ({
+              ...sudoku,
+              context: {
+                ...sudoku.context,
+                elapsedTime: sudoku.context.elapsedTime + 1,
+              },
             })),
           togglePause,
         }}
@@ -241,8 +297,8 @@ export default function Page() {
         <div className="w-auto">
           <InformationBar resetSudoku={resetSudoku} />
           <MainPlayground
-            matrix={sudokuData.matrix}
-            selectedPosition={sudokuData.selectedPosition}
+            matrix={sudoku.data.matrix}
+            selectedPosition={sudoku.context.selectedPosition}
             setPosition={setPosition}
           />
         </div>

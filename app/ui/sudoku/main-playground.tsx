@@ -1,7 +1,7 @@
 import "./main-playground.css";
 import { classNames } from "../../utils/common";
 import { isRelatedCell } from "../../utils/location";
-import { SudokuData } from "../../types/sudoku";
+import { Position, SudokuCell } from "../../types/sudoku";
 import { NotingCell } from "./noting-cell";
 import { useContext } from "react";
 import { DefaultSudokuContext } from "../../context/sudoku-context";
@@ -12,7 +12,11 @@ export function MainPlayground({
   matrix,
   selectedPosition,
   setPosition,
-}: SudokuData & { setPosition: (rowIndex: number, colIndex: number) => void }) {
+}: {
+  matrix: SudokuCell[][];
+  selectedPosition?: Position;
+  setPosition: (rowIndex: number, colIndex: number) => void;
+}) {
   const { isPause, togglePause } = useContext(DefaultSudokuContext);
 
   const selectedValue = getSelectCell()?.value;
@@ -23,7 +27,7 @@ export function MainPlayground({
 
     return rowIndex === i && colIndex === j;
   }
-  function onTdClick(rowIndex: number, colIndex: number) {    
+  function onTdClick(rowIndex: number, colIndex: number) {
     setPosition(rowIndex, colIndex);
   }
 
@@ -70,7 +74,7 @@ export function MainPlayground({
                           selectedPosition && !isPause
                             ? isRelatedCell(
                                 { rowIndex, colIndex },
-                                selectedPosition,
+                                selectedPosition
                               ) &&
                               // keep highlight background color of same value cells.
                               (selectedValue !== cell.value ||
@@ -79,7 +83,7 @@ export function MainPlayground({
                       })
                     }
                     onClick={() => onTdClick(rowIndex, colIndex)}
-                  >                  
+                  >
                     {isPause && <div className="noting-cell"></div>}
                     {!isPause && showNotingCell && (
                       <NotingCell
