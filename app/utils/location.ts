@@ -1,4 +1,3 @@
-// Define a type for position
 import { Position, SudokuCell } from "../types/sudoku";
 
 export function isRelatedCell(targetA: Position, targetB: Position): boolean {

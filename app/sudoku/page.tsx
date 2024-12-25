@@ -30,7 +30,7 @@ export default function Page() {
     return setSudokuDataInternal(...arg);
   }
 
-  // 初始化数据
+  // init sudoku data
   useEffect(() => {
     const savedContext = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_CONTEXT);
     const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_DATA);

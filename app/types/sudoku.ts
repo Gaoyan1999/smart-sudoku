@@ -31,3 +31,6 @@ export type Position = {
   rowIndex: number;
   colIndex: number;
 };
+
+export type SudokuDifficulty = "Easy" | "Medium" | "Hard" | "Expert" | "Master";
+  

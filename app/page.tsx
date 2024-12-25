@@ -1,8 +1,8 @@
-import { createClient } from "@/app/utils/supabase/server";
+import { fetchNewSudokuPuzzleApi } from "./lib/sudoku-api-client";
 
 export default async function Page() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("sudoku_puzzle").select();
+  const data = await fetchNewSudokuPuzzleApi('Easy');
   console.log(data);
   return <h1>Hello, Next.js!</h1>;
 }
+

@@ -55,6 +55,7 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
 
   return result;
 }
+
 export function isSudokuFinished(matrix: SudokuCell[][]) {
   return matrix.every((row) =>
     row.every(
