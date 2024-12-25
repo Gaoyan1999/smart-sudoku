@@ -1,6 +1,6 @@
 "use client";
 import { SudokuData, SudokuDataContext } from "../types/sudoku";
-import { fillCells } from "../utils/cell-calculation";
+import { fillCells } from "../utils/sudoku-utils";
 
 export function getDefaultSudokuContext(): SudokuDataContext {
   return {

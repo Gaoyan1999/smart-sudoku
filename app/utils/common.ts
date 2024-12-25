@@ -1,5 +1,3 @@
-import { SudokuCell } from '../types/sudoku';
-
 export function classNames(classObject: Record<string, boolean>) {
   const classNamesArray: string[] = [];
 
@@ -26,12 +24,4 @@ export function secondToHourAndMinutes(val: number) {
   return hours > 0
     ? fixZeroStart(hours) + ":" + minutesAndSecondStr
     : minutesAndSecondStr;
-}
-
-export function isSudokuFinished(matrix: SudokuCell[][]) {
-  return matrix.every(row =>
-    row.every(cell =>
-      cell.type === "known" || (cell.type === "unknown" && cell.value === cell.realAnswer)
-    )
-  );
 }

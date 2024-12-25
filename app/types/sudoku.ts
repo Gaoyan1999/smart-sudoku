@@ -27,3 +27,7 @@ type SudokuContextUpdateFunc = {
   togglePause: () => void;
   updateElapsedTime: () => void;
 };
+export type Position = {
+  rowIndex: number;
+  colIndex: number;
+};

@@ -6,13 +6,13 @@ import { getDefaultSudokuContext, getDefaultSudokuData } from "./sudoku";
 import { getRelateCells } from "../utils/location";
 import { ToolArea } from "../ui/sudoku/tool-area";
 import { MainPlayground } from "../ui/sudoku/main-playground";
-import { fillAllCandidate } from "../utils/cell-calculation";
+import { fillAllCandidate } from "../utils/sudoku-utils";
 import {
   LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
   LOCAL_STORAGE_KEY_SUDOKU_DATA,
 } from "../const";
 import { InformationBar } from "../ui/sudoku/information-bar";
-import { isSudokuFinished } from "../utils/common";
+import { isSudokuFinished } from "../utils/sudoku-utils";
 import { CongratsModal } from "../ui/sudoku/congrats-modal";
 import { DefaultSudokuContext } from "../context/sudoku-context";
 
