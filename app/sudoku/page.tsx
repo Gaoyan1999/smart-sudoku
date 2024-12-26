@@ -1,42 +1,49 @@
-"use client";
-import { KeyboardEventHandler, useState } from "react";
-import { Sudoku } from "../types/sudoku";
-import { remove, throttle } from "lodash";
-import { getDefaultSudoku } from "./sudoku";
-import { getRelateCells } from "../utils/location";
-import { ToolArea } from "../ui/sudoku/tool-area";
-import { MainPlayground } from "../ui/sudoku/main-playground";
-import { fillAllCandidate } from "../utils/sudoku-utils";
-import { InformationBar } from "../ui/sudoku/information-bar";
-import { isSudokuFinished } from "../utils/sudoku-utils";
-import { CongratsModal } from "../ui/sudoku/congrats-modal";
-import { DefaultSudokuContext } from "../context/sudoku-context";
+'use client';
+import { KeyboardEventHandler, useState, useEffect } from 'react';
+import { Sudoku } from '../types/sudoku';
+import { remove, throttle } from 'lodash';
+import { constructSudoku, getDefaultSudoku } from './sudoku';
+import { getRelateCells } from '../utils/location';
+import { ToolArea } from '../ui/sudoku/tool-area';
+import { MainPlayground } from '../ui/sudoku/main-playground';
+import { fillAllCandidate } from '../utils/sudoku-utils';
+import { isSudokuFinished } from '../utils/sudoku-utils';
+import { CongratsModal } from '../ui/sudoku/congrats-modal';
+import { DefaultSudokuContext } from '../context/sudoku-context';
+import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
 
 export default function Page() {
   const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
-
   const [showCongrats, setShowCongrats] = useState(false);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setSudokuInternal((sudoku) => ({
+          ...sudoku,
+          context: { ...sudoku.context, isLoading: true },
+        }));
+        const puzzleData = await fetchNewSudokuPuzzleApi('Expert');
+        if (puzzleData) {
+          setSudokuInternal(constructSudoku(puzzleData));
+          setSudokuInternal((sudoku) => ({
+            ...sudoku,
+            context: { ...sudoku.context, isLoading: false },
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchData();
+  }, []);
+
   function setSudoku(...arg: Parameters<typeof setSudokuInternal>) {
-    if (sudoku.context.isPause) {
+    if (sudoku.context.isPause || sudoku.context.isLoading) {
       return;
     }
     setSudokuInternal(...arg);
   }
-
-  // // init sudoku data
-  // useEffect(() => {
-  //   const savedContext = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_CONTEXT);
-  //   const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_DATA);
-
-  //   if (savedContext) {
-  //     try {
-  //       setSudokuContext(JSON.parse(savedContext));
-  //     } catch (e) {
-  //       console.error("Failed to parse saved context");
-  //     }
-  //   }
-
   //   if (savedData) {
   //     try {
   //       setSudokuDataInternal(JSON.parse(savedData));
@@ -72,8 +79,8 @@ export default function Page() {
     });
   }
 
-  function togglePause() {
-    setSudoku((sudoku) => {
+  function togglePause() {    
+    setSudokuInternal((sudoku) => {
       return {
         ...sudoku,
         context: {
@@ -99,7 +106,7 @@ export default function Page() {
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
-    if (cell.type !== "unknown" || val < 0 || val > 9) {
+    if (cell.type !== 'unknown' || val < 0 || val > 9) {
       return;
     }
     cell.value = val;
@@ -121,7 +128,7 @@ export default function Page() {
   ) {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
-    if (cell.type !== "unknown" || candidateNumber < 0 || candidateNumber > 9) {
+    if (cell.type !== 'unknown' || candidateNumber < 0 || candidateNumber > 9) {
       return;
     }
     if (candidateNumber === 0) {
@@ -161,7 +168,7 @@ export default function Page() {
       const matrix = sudoku.data.matrix;
       matrix.forEach((row) => {
         row.forEach((col) => {
-          if (col.type !== "known") {
+          if (col.type !== 'known') {
             col.value = 0;
             col.notingCandidates = [];
           }
@@ -174,7 +181,8 @@ export default function Page() {
           elapsedTime: 0,
           isPause: false,
           isFinished: false,
-          mode: "normal",
+          isLoading: false,
+          mode: 'normal',
         },
       };
     });
@@ -188,7 +196,7 @@ export default function Page() {
         ...sudoku,
         context: {
           ...sudoku.context,
-          mode: sudoku.context.mode === "normal" ? "noting" : "normal",
+          mode: sudoku.context.mode === 'normal' ? 'noting' : 'normal',
         },
       };
     });
@@ -196,23 +204,23 @@ export default function Page() {
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
-    if (sudoku.context.isPause && code !== "Space") {
+    if (sudoku.context.isPause && code !== 'Space') {
       return;
     }
     // mode control and some shortcut
-    if (code === "Space") {
+    if (code === 'Space') {
       togglePause();
     }
-    if (code === "KeyX") {
+    if (code === 'KeyX') {
       switchMode();
-    } else if (code === "KeyC") {
+    } else if (code === 'KeyC') {
       fillAllCandidates();
     }
 
     // Cell control
     if (!sudoku.context.selectedPosition) return;
     const { rowIndex, colIndex } = sudoku.context.selectedPosition;
-    if (code === "Escape") {
+    if (code === 'Escape') {
       setSudoku((sudoku) => {
         return {
           ...sudoku,
@@ -222,32 +230,32 @@ export default function Page() {
           },
         };
       });
-    } else if (code === "ArrowLeft") {
+    } else if (code === 'ArrowLeft') {
       setPosition(rowIndex, colIndex - 1 < 0 ? 0 : colIndex - 1);
-    } else if (code === "ArrowRight") {
+    } else if (code === 'ArrowRight') {
       setPosition(rowIndex, colIndex + 1 > 8 ? 8 : colIndex + 1);
-    } else if (code === "ArrowUp") {
+    } else if (code === 'ArrowUp') {
       setPosition(rowIndex - 1 < 0 ? 0 : rowIndex - 1, colIndex);
-    } else if (code === "ArrowDown") {
+    } else if (code === 'ArrowDown') {
       setPosition(rowIndex + 1 > 8 ? 8 : rowIndex + 1, colIndex);
     }
     const matrix = sudoku.data.matrix;
     const targetCell = matrix[rowIndex][colIndex];
-    if (targetCell.type !== "unknown") {
+    if (targetCell.type !== 'unknown') {
       return;
     }
     if (sudoku.context.isFinished) {
       return;
     }
     // operation for cell value
-    if (code === "Backspace") {
+    if (code === 'Backspace') {
       setCellValue(rowIndex, colIndex, 0);
       setNotingCandidates(rowIndex, colIndex, 0);
     }
     const is1To9 = /^Digit[1-9]$/;
     if (is1To9.test(code)) {
       const num = +code[5];
-      if (sudoku.context.mode === "normal") {
+      if (sudoku.context.mode === 'normal') {
         setCellValue(rowIndex, colIndex, num);
         // check the sudoku is finished
         if (isSudokuFinished(matrix)) {
@@ -272,7 +280,7 @@ export default function Page() {
   return (
     <div
       className="p-4 flex h-full relative"
-      style={{ outline: "none" }}
+      style={{ outline: 'none' }}
       tabIndex={1}
       onKeyDown={handleKeyDown}
     >
@@ -295,12 +303,13 @@ export default function Page() {
           <ToolArea showAllCandidates={fillAllCandidates} />
         </div>
         <div className="w-auto">
-          <InformationBar resetSudoku={resetSudoku} />
-          <MainPlayground
-            matrix={sudoku.data.matrix}
-            selectedPosition={sudoku.context.selectedPosition}
-            setPosition={setPosition}
-          />
+          {
+            <MainPlayground
+              sudoku={sudoku}
+              setPosition={setPosition}
+              resetSudoku={resetSudoku}
+            />
+          }
         </div>
       </DefaultSudokuContext.Provider>
 

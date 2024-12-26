@@ -1,4 +1,5 @@
 "use client";
+import { SudokuPuzzleEntity } from "../types/database.type";
 import { Sudoku } from "../types/sudoku";
 import { fillCells } from "../utils/sudoku-utils";
 
@@ -15,6 +16,23 @@ export function getDefaultSudoku(): Sudoku {
       matrix: fillCells(data.mission, data.solution),
       id: "mock-id",
       difficulty: "Easy",
+    },
+    context: {
+      mode: "normal",
+      isPause: false,
+      isLoading: true,
+      elapsedTime: 0,
+      isFinished: false,
+    },
+  };
+}
+
+export function constructSudoku(entity: SudokuPuzzleEntity): Sudoku {
+  return {
+    data: {
+      matrix: fillCells(entity.puzzle, entity.answer),
+      id: entity.id,
+      difficulty: entity.difficulty,
     },
     context: {
       mode: "normal",

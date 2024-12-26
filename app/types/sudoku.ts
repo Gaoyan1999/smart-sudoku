@@ -16,6 +16,7 @@ export type SudokuData = {
 export type SudokuContext = {
   mode: "normal" | "noting";
   isPause: boolean;
+  isLoading: boolean;
   isFinished: boolean;
   // unit: second
   elapsedTime: number;

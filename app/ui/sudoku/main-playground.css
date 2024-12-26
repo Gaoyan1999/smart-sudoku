@@ -18,7 +18,7 @@
   }
 }
 
-.pause-mask {
+.pause-and-loading-mask {
   @apply absolute;
   top: 50%;
   left: 50%;
