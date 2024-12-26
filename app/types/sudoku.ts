@@ -8,21 +8,22 @@ export type SudokuCell = {
 };
 
 export type SudokuData = {
+  id: string;
+  difficulty: SudokuDifficulty;
   matrix: SudokuCell[][];
-  selectedPosition?: { rowIndex: number; colIndex: number };
 };
 
-export type SudokuContext = SudokuDataContext & SudokuContextUpdateFunc;
-
-export type SudokuDataContext = {
+export type SudokuContext = {
   mode: "normal" | "noting";
   isPause: boolean;
+  isLoading: boolean;
   isFinished: boolean;
   // unit: second
   elapsedTime: number;
+  selectedPosition?: { rowIndex: number; colIndex: number };
 };
 
-type SudokuContextUpdateFunc = {
+export type SudokuContextUpdateFunc = {
   switchMode: () => void;
   togglePause: () => void;
   updateElapsedTime: () => void;
@@ -33,4 +34,9 @@ export type Position = {
 };
 
 export type SudokuDifficulty = "Easy" | "Medium" | "Hard" | "Expert" | "Master";
-  
+
+// whole data structure of sudoku
+export type Sudoku = {
+  data: SudokuData;
+  context: SudokuContext;
+};
