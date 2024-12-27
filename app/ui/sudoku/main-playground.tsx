@@ -45,20 +45,11 @@ export function MainPlayground({
       <InformationBar resetSudoku={resetSudoku} />
       <div className="relative">
         {isPause ? (
-          <div
-            className="pause-and-loading-mask cursor-pointer"
-            onClick={togglePause}
-          >
-            <PlayCircleOutlineIcon
-              sx={{ color: blue[800], fontSize: '60px' }}
-            />
+          <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
+            <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: '60px' }} />
           </div>
         ) : null}
-        {isLoading ? (
-          <div className="pause-and-loading-mask cursor-pointer">
-            Loading...
-          </div>
-        ) : null}
+        {isLoading ? <div className="pause-and-loading-mask cursor-pointer">Loading...</div> : null}
         <table className="sudoku-table">
           <tbody>
             {matrix.map((row, rowIndex) => (
@@ -71,8 +62,7 @@ export function MainPlayground({
                 }
               >
                 {row.map((cell, colIndex) => {
-                  const showNotingCell =
-                    cell.value === 0 && cell.notingCandidates.length > 0;
+                  const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
                   return (
                     <td
                       key={colIndex}
@@ -80,20 +70,14 @@ export function MainPlayground({
                         'sudoku-cell cursor-pointer' +
                         classNames({
                           // border setting
-                          'border-solid border-r border-r-black':
-                            colIndex == 2 || colIndex === 5,
+                          'border-solid border-r border-r-black': colIndex == 2 || colIndex === 5,
                           // background setting
-                          'bg-blue-200':
-                            isSelected(rowIndex, colIndex) && !maskCellContent,
+                          'bg-blue-200': isSelected(rowIndex, colIndex) && !maskCellContent,
                           'bg-neutral-200':
                             selectedPosition && !maskCellContent
-                              ? isRelatedCell(
-                                  { rowIndex, colIndex },
-                                  selectedPosition
-                                ) &&
+                              ? isRelatedCell({ rowIndex, colIndex }, selectedPosition) &&
                                 // keep highlight background color of same value cells.
-                                (selectedValue !== cell.value ||
-                                  selectedValue === 0)
+                                (selectedValue !== cell.value || selectedValue === 0)
                               : false,
                         })
                       }
@@ -111,8 +95,7 @@ export function MainPlayground({
                           className={classNames({
                             'normal-mode-cell': true,
                             'text-blue-800': cell.type === 'unknown',
-                            'bg-blue-600':
-                              cell.value === selectedValue && cell.value !== 0,
+                            'bg-blue-600': cell.value === selectedValue && cell.value !== 0,
                             'bg-blue-600 text-white':
                               cell.value === selectedValue &&
                               cell.value !== 0 &&

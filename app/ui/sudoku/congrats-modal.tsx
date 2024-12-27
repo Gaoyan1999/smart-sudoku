@@ -20,4 +20,4 @@ export function CongratsModal({ isOpen, onClose }: CongratsModalProps) {
       </div>
     </div>
   );
-} 
+}

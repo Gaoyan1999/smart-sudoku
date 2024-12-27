@@ -1,8 +1,8 @@
-import { SudokuCell, SudokuData } from "../types/sudoku";
-import { uniq } from "lodash";
-import { getRelateCells } from "./location";
+import { SudokuCell, SudokuData } from '../types/sudoku';
+import { uniq } from 'lodash';
+import { getRelateCells } from './location';
 
-export function fillAllCandidate(matrix: SudokuData["matrix"]) {
+export function fillAllCandidate(matrix: SudokuData['matrix']) {
   matrix.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       cell.notingCandidates = findMissingNumbers(
@@ -30,7 +30,7 @@ function findMissingNumbers(nums: number[]) {
 export function fillCells(mission: string, solution: string): SudokuCell[][] {
   const result: SudokuCell[][] = [];
   if (mission.length !== 81 || solution.length !== 81) {
-    throw Error("Invalid input");
+    throw Error('Invalid input');
   }
   const missionRowsString: string[] = [];
   const solutionRowsString: string[] = [];
@@ -46,7 +46,7 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
 
       row.push({
         value: value,
-        type: value === 0 ? "unknown" : "known",
+        type: value === 0 ? 'unknown' : 'known',
         realAnswer: +solutionRowsString[rowIndex][i],
         notingCandidates: [],
       });
@@ -59,9 +59,7 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
 export function isSudokuFinished(matrix: SudokuCell[][]) {
   return matrix.every((row) =>
     row.every(
-      (cell) =>
-        cell.type === "known" ||
-        (cell.type === "unknown" && cell.value === cell.realAnswer)
+      (cell) => cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer)
     )
   );
 }
