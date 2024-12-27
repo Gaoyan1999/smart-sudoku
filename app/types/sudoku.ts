@@ -4,7 +4,7 @@ export type SudokuCell = {
   // Candidate numbers entered by the user in the current cell (user's notes), representing potential solutions for this cell.
   // These are the notes the user makes to track possible values before making the final decision.
   notingCandidates: number[];
-  type: "known" | "unknown" | "errorAnswer";
+  type: 'known' | 'unknown' | 'errorAnswer';
 };
 
 export type SudokuData = {
@@ -14,7 +14,7 @@ export type SudokuData = {
 };
 
 export type SudokuContext = {
-  mode: "normal" | "noting";
+  mode: 'normal' | 'noting';
   isPause: boolean;
   isLoading: boolean;
   isFinished: boolean;
@@ -33,7 +33,7 @@ export type Position = {
   colIndex: number;
 };
 
-export type SudokuDifficulty = "Easy" | "Medium" | "Hard" | "Expert" | "Master";
+export type SudokuDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master';
 
 // whole data structure of sudoku
 export type Sudoku = {

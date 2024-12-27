@@ -1,4 +1,4 @@
-import { Position, SudokuCell } from "../types/sudoku";
+import { Position, SudokuCell } from '../types/sudoku';
 
 export function isRelatedCell(targetA: Position, targetB: Position): boolean {
   // Check if either targetA or targetB is not defined

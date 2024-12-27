@@ -1,24 +1,22 @@
-"use client";
-import { SudokuPuzzleEntity } from "../types/database.type";
-import { Sudoku } from "../types/sudoku";
-import { fillCells } from "../utils/sudoku-utils";
+'use client';
+import { SudokuPuzzleEntity } from '../types/database.type';
+import { Sudoku } from '../types/sudoku';
+import { fillCells } from '../utils/sudoku-utils';
 
 export function getDefaultSudoku(): Sudoku {
   const data = {
-    mission:
-      "400800007350672004280000103000007000028300400070204916092405030800763009730000051",
-    solution:
-      "469831527351672894287549163946157382128396475573284916692415738815763249734928651",
+    mission: '400800007350672004280000103000007000028300400070204916092405030800763009730000051',
+    solution: '469831527351672894287549163946157382128396475573284916692415738815763249734928651',
   };
   // const puzzle = await fetchNewSudokuPuzzleApi('Easy');
   return {
     data: {
       matrix: fillCells(data.mission, data.solution),
-      id: "mock-id",
-      difficulty: "Easy",
+      id: 'mock-id',
+      difficulty: 'Easy',
     },
     context: {
-      mode: "normal",
+      mode: 'normal',
       isPause: false,
       isLoading: true,
       elapsedTime: 0,
@@ -35,7 +33,7 @@ export function constructSudoku(entity: SudokuPuzzleEntity): Sudoku {
       difficulty: entity.difficulty,
     },
     context: {
-      mode: "normal",
+      mode: 'normal',
       isPause: false,
       elapsedTime: 0,
       isFinished: false,

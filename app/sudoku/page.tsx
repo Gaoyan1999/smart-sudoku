@@ -79,7 +79,7 @@ export default function Page() {
     });
   }
 
-  function togglePause() {    
+  function togglePause() {
     setSudokuInternal((sudoku) => {
       return {
         ...sudoku,
@@ -121,11 +121,7 @@ export default function Page() {
     });
   }
 
-  function setNotingCandidates(
-    rowIndex: number,
-    colIndex: number,
-    candidateNumber: number
-  ) {
+  function setNotingCandidates(rowIndex: number, colIndex: number, candidateNumber: number) {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
     if (cell.type !== 'unknown' || candidateNumber < 0 || candidateNumber > 9) {
@@ -303,20 +299,11 @@ export default function Page() {
           <ToolArea showAllCandidates={fillAllCandidates} />
         </div>
         <div className="w-auto">
-          {
-            <MainPlayground
-              sudoku={sudoku}
-              setPosition={setPosition}
-              resetSudoku={resetSudoku}
-            />
-          }
+          {<MainPlayground sudoku={sudoku} setPosition={setPosition} resetSudoku={resetSudoku} />}
         </div>
       </DefaultSudokuContext.Provider>
 
-      <CongratsModal
-        isOpen={showCongrats}
-        onClose={() => setShowCongrats(false)}
-      />
+      <CongratsModal isOpen={showCongrats} onClose={() => setShowCongrats(false)} />
     </div>
   );
 }

@@ -8,20 +8,17 @@ export function classNames(classObject: Record<string, boolean>) {
       classNamesArray.push(className);
     }
   }
-  return " " + classNamesArray.join(" ") + " ";
+  return ' ' + classNamesArray.join(' ') + ' ';
 }
 
 export function secondToHourAndMinutes(val: number) {
   function fixZeroStart(val: number) {
-    return val.toString().padStart(2, "0");
+    return val.toString().padStart(2, '0');
   }
   const second = val % 60;
   let minutes = Math.floor(val / 60);
   const hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
-  const minutesAndSecondStr =
-    fixZeroStart(minutes) + ":" + fixZeroStart(second);
-  return hours > 0
-    ? fixZeroStart(hours) + ":" + minutesAndSecondStr
-    : minutesAndSecondStr;
+  const minutesAndSecondStr = fixZeroStart(minutes) + ':' + fixZeroStart(second);
+  return hours > 0 ? fixZeroStart(hours) + ':' + minutesAndSecondStr : minutesAndSecondStr;
 }

@@ -1,5 +1,5 @@
-import { range } from "lodash";
-import { classNames } from "../../utils/common";
+import { range } from 'lodash';
+import { classNames } from '../../utils/common';
 
 export function NotingCell({
   selectNumber,
@@ -9,13 +9,13 @@ export function NotingCell({
   notingNumbers: number[];
 }) {
   return (
-    <div className={"noting-cell"}>
+    <div className={'noting-cell'}>
       {range(1, 10).map((i) => {
         return notingNumbers.includes(i) ? (
           <div
             key={i}
             className={classNames({
-              "bg-blue-600 text-white": i === selectNumber,
+              'bg-blue-600 text-white': i === selectNumber,
             })}
           >
             {i}

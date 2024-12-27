@@ -1,20 +1,11 @@
-import { useContext } from "react";
-import { DefaultSudokuContext } from "../../context/sudoku-context";
-import {
-  ToggleButton,
-  ToggleButtonGroup,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import * as React from "react";
-import { purple } from "@mui/material/colors";
+import { useContext } from 'react';
+import { DefaultSudokuContext } from '../../context/sudoku-context';
+import { ToggleButton, ToggleButtonGroup, IconButton, Tooltip } from '@mui/material';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import * as React from 'react';
+import { purple } from '@mui/material/colors';
 
-export function ToolArea({
-  showAllCandidates,
-}: {
-  showAllCandidates: () => void;
-}) {
+export function ToolArea({ showAllCandidates }: { showAllCandidates: () => void }) {
   const { mode, switchMode } = useContext(DefaultSudokuContext);
 
   function handleModeChanged(_: React.MouseEvent<HTMLElement>, val: string) {
