@@ -19,13 +19,14 @@ export type SudokuData = {
 };
 
 export type SudokuContext = {
-  mode: 'normal' | 'noting';
+  mode: 'normal' | 'noting' | 'hint';
   isPause: boolean;
   isLoading: boolean;
   isFinished: boolean;
   // unit: second
   elapsedTime: number;
   selectedPosition?: { rowIndex: number; colIndex: number };
+  hint?: SudokuHint;
 };
 
 export type SudokuContextUpdateFunc = {

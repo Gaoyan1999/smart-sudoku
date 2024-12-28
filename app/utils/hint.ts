@@ -2,8 +2,10 @@ import { SudokeCellWithPosition, SudokuData, SudokuHint } from '../types/sudoku'
 import { getRelateCells } from './location';
 import { isValidCell } from './sudoku-utils';
 
-export function getOneHint(matrix: SudokuData['matrix']) {
-  return isOnlyOneCandidate(matrix);
+export function getHint(matrix: SudokuData['matrix']) {
+  const hint = isOnlyOneCandidate(matrix);
+  console.log(hint);
+  return hint;
 }
 // rule 1: There is only one candidate number in the cell.
 function isOnlyOneCandidate(matrix: SudokuData['matrix']): SudokuHint | undefined {
