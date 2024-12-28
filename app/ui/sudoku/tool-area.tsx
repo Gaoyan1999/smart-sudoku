@@ -6,7 +6,17 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { purple, indigo, yellow } from '@mui/material/colors';
 import * as React from 'react';
-export function ToolArea({ showAllCandidates, handleNumberInput }: { showAllCandidates: () => void, handleNumberInput: (num: number) => void }) {
+import { getOneHint } from '@/app/utils/hint';
+import { Sudoku } from '@/app/types/sudoku';
+export function ToolArea({
+  sudoku,
+  showAllCandidates,
+  handleNumberInput,
+}: {
+  sudoku: Sudoku;
+  showAllCandidates: () => void;
+  handleNumberInput: (num: number) => void;
+}) {
   const { mode, switchMode } = useContext(DefaultSudokuContext);
 
   return (
@@ -22,12 +32,18 @@ export function ToolArea({ showAllCandidates, handleNumberInput }: { showAllCand
           <DriveFileRenameOutlineIcon sx={{ color: mode === 'normal' ? undefined : indigo[700] }} />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Hint">
+      <Tooltip
+        title="Hint"
+        onClick={() => {
+          const hint = getOneHint(sudoku.data.matrix);
+          console.log(hint);
+        }}
+      >
         <IconButton>
           <QuestionMarkIcon sx={{ color: yellow[800] }} />
         </IconButton>
       </Tooltip>
-      
+
       {/* number input grid */}
       <div className="grid grid-cols-3 gap-1 mt-2 max-w-[400px]">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (

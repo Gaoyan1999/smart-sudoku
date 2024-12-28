@@ -1,4 +1,4 @@
-import { Position, SudokuCell } from '../types/sudoku';
+import { Position, SudokeCellWithPosition, SudokuCell } from '../types/sudoku';
 
 export function isRelatedCell(targetA: Position, targetB: Position): boolean {
   // Check if either targetA or targetB is not defined
@@ -44,11 +44,11 @@ function isInSameBlock(posA: Position, posB: Position): boolean {
 }
 
 export function getRelateCells(position: Position, matrix: SudokuCell[][]) {
-  const result: SudokuCell[] = [];
+  const result: SudokeCellWithPosition[] = [];
   matrix.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       if (isRelatedCell(position, { rowIndex, colIndex })) {
-        result.push(cell);
+        result.push({ ...cell, position: { rowIndex, colIndex } });
       }
     });
   });

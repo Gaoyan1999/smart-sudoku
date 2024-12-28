@@ -298,7 +298,11 @@ export default function Page() {
           {<MainPlayground sudoku={sudoku} setPosition={setPosition} resetSudoku={resetSudoku} />}
         </div>
         <div className="">
-          <ToolArea showAllCandidates={fillAllCandidates} handleNumberInput={handleNumberInput} />
+          <ToolArea
+            sudoku={sudoku}
+            showAllCandidates={fillAllCandidates}
+            handleNumberInput={handleNumberInput}
+          />
         </div>
       </DefaultSudokuContext.Provider>
 
