@@ -1,4 +1,5 @@
 'use client';
+import './page.css';
 import { KeyboardEventHandler, useState, useEffect } from 'react';
 import { Sudoku } from '../types/sudoku';
 import { remove, throttle } from 'lodash';
@@ -11,7 +12,7 @@ import { isSudokuFinished } from '../utils/sudoku-utils';
 import { CongratsModal } from '../ui/sudoku/congrats-modal';
 import { DefaultSudokuContext } from '../context/sudoku-context';
 import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
-import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY } from '../const';
+import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY, MOCK_SUDOKU_ID } from '../const';
 
 export default function Page() {
   const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
@@ -36,10 +37,12 @@ export default function Page() {
         console.error(err);
       }
     }
-    // read from local storage
-    const sudokuData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY);    
-    if (sudokuData) {
-      setSudokuInternal(JSON.parse(sudokuData));
+    // read from local storage at first, if not found, fetch from server.
+    const sudokuDataStr = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY);
+    if (sudokuDataStr) {
+      const sudokuData = JSON.parse(sudokuDataStr) as Sudoku;
+      sudokuData.context.isLoading = false;
+      setSudokuInternal(sudokuData);
     } else {
       fetchData();
     }
@@ -51,8 +54,10 @@ export default function Page() {
     }
     setSudokuInternal(...arg);
   }
-  useEffect(() => {    
-    localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
+  useEffect(() => {
+    if (sudoku.data.id !== MOCK_SUDOKU_ID) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
+    }
   }, [sudoku]);
   // ------------------------ START: sudoku data operation -------------------------------
   function fillAllCandidates() {
@@ -89,6 +94,30 @@ export default function Page() {
         },
       };
     });
+  }
+
+  function handleNumberInput(num: number) {
+    if (!sudoku.context.selectedPosition) return;
+    const { rowIndex, colIndex } = sudoku.context.selectedPosition;
+    if (sudoku.context.mode === 'normal') {
+      setCellValue(rowIndex, colIndex, num);
+      // check the sudoku is finished
+      if (isSudokuFinished(sudoku.data.matrix)) {
+        setSudoku((sudoku) => ({
+          ...sudoku,
+          context: { ...sudoku.context, isFinished: true },
+        }));
+        setTimeout(() => {
+          setShowCongrats(true);
+        }, 100);
+      }
+      // remove the candidate numbers in related cells.
+      getRelateCells({ rowIndex, colIndex }, sudoku.data.matrix).filter((cell) => {
+        remove(cell.notingCandidates, (value) => value === num);
+      });
+    } else {
+      setNotingCandidates(rowIndex, colIndex, num);
+    }
   }
 
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
@@ -239,31 +268,13 @@ export default function Page() {
     const is1To9 = /^Digit[1-9]$/;
     if (is1To9.test(code)) {
       const num = +code[5];
-      if (sudoku.context.mode === 'normal') {
-        setCellValue(rowIndex, colIndex, num);
-        // check the sudoku is finished
-        if (isSudokuFinished(matrix)) {
-          setSudoku((sudoku) => ({
-            ...sudoku,
-            context: { ...sudoku.context, isFinished: true },
-          }));
-          setTimeout(() => {
-            setShowCongrats(true);
-          }, 100);
-        }
-        // remove the candidate numbers in related cells.
-        getRelateCells({ rowIndex, colIndex }, matrix).filter((cell) => {
-          remove(cell.notingCandidates, (value) => value === num);
-        });
-      } else {
-        setNotingCandidates(rowIndex, colIndex, num);
-      }
+      handleNumberInput(num);
     }
   }, 100);
 
   return (
     <div
-      className="p-4 flex h-full relative"
+      className="p-4 flex h-full relative space-x-4"
       style={{ outline: 'none' }}
       tabIndex={1}
       onKeyDown={handleKeyDown}
@@ -283,11 +294,11 @@ export default function Page() {
           togglePause,
         }}
       >
-        <div className="w-4/12">
-          <ToolArea showAllCandidates={fillAllCandidates} />
-        </div>
-        <div className="w-auto">
+        <div className="">
           {<MainPlayground sudoku={sudoku} setPosition={setPosition} resetSudoku={resetSudoku} />}
+        </div>
+        <div className="">
+          <ToolArea showAllCandidates={fillAllCandidates} handleNumberInput={handleNumberInput} />
         </div>
       </DefaultSudokuContext.Provider>
 

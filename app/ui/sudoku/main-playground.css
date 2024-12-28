@@ -1,6 +1,6 @@
 .sudoku-table {
   @apply border border-black border-solid;
-  outline: none;
+  outline: none;  
 }
 
 .sudoku-cell {
