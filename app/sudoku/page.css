@@ -1,0 +1,10 @@
+.main-playground-container {
+  transform: scale(1.5);
+  transform-origin: top left;
+  margin-right: 50%;
+}
+
+.tool-area-container {
+  transform: scale(1.5);
+  transform-origin: top right;
+}

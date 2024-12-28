@@ -106,7 +106,7 @@ export function MainPlayground({
                               cell.value === selectedValue &&
                               cell.value !== 0 &&
                               cell.value === cell.realAnswer,
-                            'text-red-500': cell.value !== cell.realAnswer,
+                            'text-red-600': cell.value !== cell.realAnswer,
                           })}
                         >
                           {cell.value === 0 ? undefined : cell.value}
