@@ -27,8 +27,8 @@ function findMissingNumbers(nums: number[]) {
   return results;
 }
 
-export function fillCells(mission: string, solution: string): SudokuCell[][] {
-  const result: SudokuCell[][] = [];
+export function initMatrix(mission: string, solution: string): SudokuCell[][] {
+  const maxtrix: SudokuCell[][] = [];
   if (mission.length !== 81 || solution.length !== 81) {
     throw Error('Invalid input');
   }
@@ -40,7 +40,7 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
   }
   missionRowsString.forEach((rowString, rowIndex) => {
     const row: SudokuCell[] = [];
-    result.push(row);
+    maxtrix.push(row);
     for (let i = 0; i < rowString.length; i++) {
       const value = +rowString[i];
 
@@ -49,11 +49,27 @@ export function fillCells(mission: string, solution: string): SudokuCell[][] {
         type: value === 0 ? 'unknown' : 'known',
         realAnswer: +solutionRowsString[rowIndex][i],
         notingCandidates: [],
+        actualCandidates: [],
       });
     }
   });
 
-  return result;
+  // fill actualCandidates
+  maxtrix.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (cell.type === 'unknown') {
+        cell.actualCandidates = findMissingNumbers(
+          uniq(
+            getRelateCells({ rowIndex, colIndex }, maxtrix)
+              .filter((cell) => cell.value !== 0)
+              .map((cell) => cell.value)
+          )
+        )
+      }
+    });
+  });
+
+  return maxtrix;
 }
 
 export function isSudokuFinished(matrix: SudokuCell[][]) {
@@ -62,4 +78,9 @@ export function isSudokuFinished(matrix: SudokuCell[][]) {
       (cell) => cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer)
     )
   );
+}
+
+
+export function isValidCell(cell: SudokuCell) {
+  return cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer);
 }

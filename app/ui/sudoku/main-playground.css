@@ -1,10 +1,10 @@
 .sudoku-table {
   @apply border border-black border-solid;
-  outline: none;  
+  outline: none;
 }
 
 .sudoku-cell {
-  @apply m-auto text-center p-0 w-auto;
+  @apply m-auto text-center p-0 w-auto cursor-pointer;
   .normal-mode-cell {
     @apply w-12 h-12;
     line-height: 48px;
@@ -30,4 +30,13 @@
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
+}
+
+@keyframes hint-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-hint-flash {
+  animation: hint-flash 2s ease-in-out infinite;
 }

@@ -8,6 +8,7 @@ import { DefaultSudokuContext } from '../../context/sudoku-context';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { blue } from '@mui/material/colors';
 import { InformationBar } from './information-bar';
+import { isEqual } from 'lodash';
 
 export function MainPlayground({
   sudoku,
@@ -20,9 +21,10 @@ export function MainPlayground({
 }) {
   const { togglePause } = useContext(DefaultSudokuContext);
   const { matrix } = sudoku.data;
-  const { selectedPosition, isPause, isLoading } = sudoku.context;
+  const { selectedPosition, isPause, isLoading, mode, hint } = sudoku.context;
   const maskCellContent = isPause || isLoading;
   const selectedValue = getSelectCell()?.value;
+  const isHintMode = mode === 'hint' && !!hint;
 
   function isSelected(i: number, j: number) {
     if (!selectedPosition) return false;
@@ -38,6 +40,47 @@ export function MainPlayground({
     if (!selectedPosition) return;
     const { rowIndex, colIndex } = selectedPosition;
     return matrix[rowIndex][colIndex];
+  }
+  function isTargetCellInHintMode(rowIndex: number, colIndex: number) {
+    if (!hint) return false;
+    return hint.position.rowIndex === rowIndex && hint.position.colIndex === colIndex;
+  }
+
+  function renderCellNode(rowIndex: number, colIndex: number) {
+    const cell = matrix[rowIndex][colIndex];
+    const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
+    if (isTargetCellInHintMode(rowIndex, colIndex)) {
+      return <div className="normal-mode-cell text-white animate-hint-flash">{hint?.answer}</div>;
+    } else if (showNotingCell) {
+      return <NotingCell selectNumber={selectedValue} notingNumbers={cell.notingCandidates} />;
+    } else {
+      return (
+        <div
+          className={
+            'normal-mode-cell' +
+            (isHintMode
+              ? classNames({
+                  'bg-blue-600 text-white': !!hint.relatedCells.find(
+                    (relatedCell) =>
+                      relatedCell.position.rowIndex === rowIndex &&
+                      relatedCell.position.colIndex === colIndex
+                  ),
+                })
+              : classNames({
+                  'text-blue-800': cell.type === 'unknown',
+                  'bg-blue-600': cell.value === selectedValue && cell.value !== 0,
+                  'bg-blue-600 text-white':
+                    cell.value === selectedValue &&
+                    cell.value !== 0 &&
+                    cell.value === cell.realAnswer,
+                  'text-red-600': cell.value !== cell.realAnswer,
+                }))
+          }
+        >
+          {cell.value === 0 ? undefined : cell.value}
+        </div>
+      );
+    }
   }
 
   return (
@@ -66,50 +109,43 @@ export function MainPlayground({
                 }
               >
                 {row.map((cell, colIndex) => {
-                  const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
                   const isRightBorder = colIndex === 2 || colIndex === 5;
                   return (
                     <td
                       key={colIndex}
                       className={
-                        'sudoku-cell cursor-pointer' +
+                        'sudoku-cell' +
                         classNames({
                           // border setting
                           'right-cell-border': isRightBorder,
                           'normal-border': !isRightBorder,
-                          // background setting
-                          'bg-blue-200': isSelected(rowIndex, colIndex) && !maskCellContent,
-                          'bg-neutral-200':
-                            selectedPosition && !maskCellContent
-                              ? isRelatedCell({ rowIndex, colIndex }, selectedPosition) &&
-                                // keep highlight background color of same value cells.
-                                (selectedValue !== cell.value || selectedValue === 0)
-                              : false,
                         })
                       }
                       onClick={() => onTdClick(rowIndex, colIndex)}
                     >
-                      {maskCellContent && <div className="noting-cell"></div>}
-                      {!maskCellContent && showNotingCell && (
-                        <NotingCell
-                          selectNumber={selectedValue}
-                          notingNumbers={cell.notingCandidates}
-                        />
-                      )}
-                      {!maskCellContent && !showNotingCell && (
+                      {maskCellContent ? (
+                        <div className="noting-cell"></div>
+                      ) : (
                         <div
-                          className={classNames({
-                            'normal-mode-cell': true,
-                            'text-blue-800': cell.type === 'unknown',
-                            'bg-blue-600': cell.value === selectedValue && cell.value !== 0,
-                            'bg-blue-600 text-white':
-                              cell.value === selectedValue &&
-                              cell.value !== 0 &&
-                              cell.value === cell.realAnswer,
-                            'text-red-600': cell.value !== cell.realAnswer,
-                          })}
+                          // handle background color
+                          className={
+                            isHintMode
+                              ? classNames({
+                                  'bg-green-700': isEqual(hint.position, { rowIndex, colIndex }),
+                                  'bg-blue-200': isRelatedCell(hint.position, {
+                                    rowIndex,
+                                    colIndex,
+                                  }),
+                                })
+                              : classNames({
+                                  'bg-blue-200': isSelected(rowIndex, colIndex),
+                                  'bg-neutral-200':
+                                    !!selectedPosition &&
+                                    isRelatedCell({ rowIndex, colIndex }, selectedPosition),
+                                })
+                          }
                         >
-                          {cell.value === 0 ? undefined : cell.value}
+                          {renderCellNode(rowIndex, colIndex)}
                         </div>
                       )}
                     </td>

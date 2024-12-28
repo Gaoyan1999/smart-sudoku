@@ -13,6 +13,7 @@ import { CongratsModal } from '../ui/sudoku/congrats-modal';
 import { DefaultSudokuContext } from '../context/sudoku-context';
 import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
 import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY, MOCK_SUDOKU_ID } from '../const';
+import { getHint } from '../utils/hint';
 
 export default function Page() {
   const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
@@ -272,6 +273,39 @@ export default function Page() {
     }
   }, 100);
 
+  // ------------------------ START: hint -------------------------------
+  function getOneHint() {
+    const hint = getHint(sudoku.data.matrix);
+    if (!hint) {
+      alert('No hint found');
+      return;
+    }
+    setSudokuInternal((sudoku) => ({
+      ...sudoku,
+      context: { ...sudoku.context, hint, mode: 'hint', selectedPosition: hint.position },
+    }));
+  }
+
+  function applyHint() {
+    if (!sudoku.context.hint) {
+      return;
+    }
+    const { answer, position, ruleType } = sudoku.context.hint;
+    if (answer && ruleType === 'fillCellDirectly') {
+      setCellValue(position.rowIndex, position.colIndex, answer);
+    }
+    clearHint();
+  }
+
+  function clearHint() {
+    setSudokuInternal((sudoku) => ({
+      ...sudoku,
+      context: { ...sudoku.context, hint: undefined, mode: 'normal' },
+    }));
+  }
+
+  // ------------------------ END: hint -------------------------------
+
   return (
     <div
       className="p-4 flex h-full relative space-x-4"
@@ -294,11 +328,18 @@ export default function Page() {
           togglePause,
         }}
       >
-        <div className="">
+        <div>
           {<MainPlayground sudoku={sudoku} setPosition={setPosition} resetSudoku={resetSudoku} />}
         </div>
-        <div className="">
-          <ToolArea showAllCandidates={fillAllCandidates} handleNumberInput={handleNumberInput} />
+        <div>
+          <ToolArea
+            sudoku={sudoku}
+            showAllCandidates={fillAllCandidates}
+            handleNumberInput={handleNumberInput}
+            getHint={getOneHint}
+            rejectHint={clearHint}
+            applyHint={applyHint}
+          />
         </div>
       </DefaultSudokuContext.Provider>
 

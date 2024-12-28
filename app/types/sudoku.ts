@@ -4,7 +4,12 @@ export type SudokuCell = {
   // Candidate numbers entered by the user in the current cell (user's notes), representing potential solutions for this cell.
   // These are the notes the user makes to track possible values before making the final decision.
   notingCandidates: number[];
+  // Candidate numbers that are actually possible for this cell.
+  actualCandidates: number[];
   type: 'known' | 'unknown' | 'errorAnswer';
+};
+export type SudokeCellWithPosition = SudokuCell & {
+  position: Position;
 };
 
 export type SudokuData = {
@@ -14,13 +19,14 @@ export type SudokuData = {
 };
 
 export type SudokuContext = {
-  mode: 'normal' | 'noting';
+  mode: 'normal' | 'noting' | 'hint';
   isPause: boolean;
   isLoading: boolean;
   isFinished: boolean;
   // unit: second
   elapsedTime: number;
   selectedPosition?: { rowIndex: number; colIndex: number };
+  hint?: SudokuHint;
 };
 
 export type SudokuContextUpdateFunc = {
@@ -39,4 +45,13 @@ export type SudokuDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master';
 export type Sudoku = {
   data: SudokuData;
   context: SudokuContext;
+};
+
+export type SudokuHint = {
+  position: Position;
+  ruleType: 'fillCellDirectly' | 'excludeCandidate';
+  rule: 'onlyOneCandidate';
+  answer?: number;
+  relatedCells: SudokeCellWithPosition[];
+  hintMessage: string;
 };
