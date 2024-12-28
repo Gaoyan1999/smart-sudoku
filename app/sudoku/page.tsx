@@ -37,8 +37,7 @@ export default function Page() {
       }
     }
     // read from local storage
-    const sudokuData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY);
-    console.log(sudokuData);
+    const sudokuData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY);    
     if (sudokuData) {
       setSudokuInternal(JSON.parse(sudokuData));
     } else {
@@ -52,8 +51,7 @@ export default function Page() {
     }
     setSudokuInternal(...arg);
   }
-  useEffect(() => {
-    console.log('save sudoku to local storage');
+  useEffect(() => {    
     localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
   }, [sudoku]);
   // ------------------------ START: sudoku data operation -------------------------------

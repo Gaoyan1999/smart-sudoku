@@ -6,18 +6,19 @@ import { grey } from '@mui/material/colors';
 import { Sudoku } from '@/app/types/sudoku';
 
 export function InformationBar({ sudoku, resetSudoku }: { sudoku: Sudoku; resetSudoku: () => void }) {
-  const { elapsedTime, updateElapsedTime, isPause, isFinished, togglePause } =
+  const { elapsedTime, updateElapsedTime, togglePause } =
     useContext(DefaultSudokuContext);
-
+  const { isFinished, isPause, isLoading  } = sudoku.context;
   useEffect(() => {
-    if (isPause || isFinished) {
+    if (isPause || isFinished || isLoading) {
       return;
     }
     const interval = setInterval(() => {
       updateElapsedTime();
     }, 1000);
     return () => clearInterval(interval);
-  }, [isPause, isFinished, updateElapsedTime]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPause, isFinished, isLoading]);
 
   return (
     <div className="flex justify-between">
