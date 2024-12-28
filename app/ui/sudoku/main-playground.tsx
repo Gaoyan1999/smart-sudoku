@@ -42,15 +42,19 @@ export function MainPlayground({
 
   return (
     <>
-      <InformationBar resetSudoku={resetSudoku} />
+      <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} />
       <div className="relative">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
             <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: '60px' }} />
           </div>
         ) : null}
-        {isLoading ? <div className="pause-and-loading-mask cursor-pointer">Loading...</div> : null}
-        <table className="sudoku-table">
+        {isLoading ? (
+          <div className="pause-and-loading-mask">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-800"></div>
+          </div>
+        ) : null}
+        <table className={classNames({ 'sudoku-table': true, 'bg-neutral-100': isLoading })}>
           <tbody>
             {matrix.map((row, rowIndex) => (
               <tr
@@ -63,6 +67,7 @@ export function MainPlayground({
               >
                 {row.map((cell, colIndex) => {
                   const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
+                  const isRightBorder = colIndex === 2 || colIndex === 5;
                   return (
                     <td
                       key={colIndex}
@@ -70,7 +75,8 @@ export function MainPlayground({
                         'sudoku-cell cursor-pointer' +
                         classNames({
                           // border setting
-                          'border-solid border-r border-r-black': colIndex == 2 || colIndex === 5,
+                          'right-cell-border': isRightBorder,
+                          'normal-border': !isRightBorder,
                           // background setting
                           'bg-blue-200': isSelected(rowIndex, colIndex) && !maskCellContent,
                           'bg-neutral-200':

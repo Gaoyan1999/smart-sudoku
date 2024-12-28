@@ -3,24 +3,26 @@ import { secondToHourAndMinutes } from '../../utils/common';
 import { DefaultSudokuContext } from '../../context/sudoku-context';
 import { Pause, PlayArrow, Replay } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
+import { Sudoku } from '@/app/types/sudoku';
 
-export function InformationBar({ resetSudoku }: { resetSudoku: () => void }) {
-  const { elapsedTime, updateElapsedTime, isPause, isFinished, togglePause } =
+export function InformationBar({ sudoku, resetSudoku }: { sudoku: Sudoku; resetSudoku: () => void }) {
+  const { elapsedTime, updateElapsedTime, togglePause } =
     useContext(DefaultSudokuContext);
-
+  const { isFinished, isPause, isLoading  } = sudoku.context;
   useEffect(() => {
-    if (isPause || isFinished) {
+    if (isPause || isFinished || isLoading) {
       return;
     }
     const interval = setInterval(() => {
       updateElapsedTime();
     }, 1000);
     return () => clearInterval(interval);
-  }, [isPause, isFinished, updateElapsedTime]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPause, isFinished, isLoading]);
 
   return (
     <div className="flex justify-between">
-      <span>Difficulty: </span>
+      <span>Difficulty: {sudoku?.data?.difficulty}</span>
       <div className="flex items-center cursor-pointer">
         <Replay sx={{ color: grey[800] }} onClick={resetSudoku} />
         {isFinished && <span className="ml-2 text-green-500">Finished</span>}

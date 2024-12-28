@@ -5,7 +5,6 @@
 
 .sudoku-cell {
   @apply m-auto text-center p-0 w-auto;
-  @apply border-solid border-neutral-400 border-[0.5px];
   .normal-mode-cell {
     @apply w-12 h-12;
     line-height: 48px;
@@ -16,6 +15,14 @@
     grid-template-rows: repeat(3, 16px);
     grid-template-columns: repeat(3, 16px);
   }
+}
+.normal-border {
+  @apply border-solid border-neutral-400 border-[0.5px];
+}
+.right-cell-border {
+  @apply border-solid;
+  @apply border-l-neutral-400 border-t-neutral-400 border-b-neutral-400 border-r-black;
+  border-width: 0.5px 1px 0.5px 0.5px;
 }
 
 .pause-and-loading-mask {

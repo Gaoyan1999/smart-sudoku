@@ -35,6 +35,7 @@ export function constructSudoku(entity: SudokuPuzzleEntity): Sudoku {
     context: {
       mode: 'normal',
       isPause: false,
+      isLoading: false,
       elapsedTime: 0,
       isFinished: false,
     },
