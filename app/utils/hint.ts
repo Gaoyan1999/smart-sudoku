@@ -1,5 +1,5 @@
 import { SudokeCellWithPosition, SudokuData, SudokuHint } from '../types/sudoku';
-import { getRelateCells } from './location';
+import { getRelatedCells } from './location';
 import { isValidCell } from './sudoku-utils';
 
 export function getHint(matrix: SudokuData['matrix']) {
@@ -16,7 +16,7 @@ function isOnlyOneCandidate(matrix: SudokuData['matrix']): SudokuHint | undefine
         const answer = cell.actualCandidates[0];
         const numberSet = new Set<number>();
         const relatedCellsResult: SudokeCellWithPosition[] = [];
-        const relatedValidCells = getRelateCells({ rowIndex: i, colIndex: j }, matrix).filter(
+        const relatedValidCells = getRelatedCells({ rowIndex: i, colIndex: j }, matrix).filter(
           isValidCell
         );
         relatedValidCells.forEach((cell) => {

@@ -43,7 +43,7 @@ function isInSameBlock(posA: Position, posB: Position): boolean {
   );
 }
 
-export function getRelateCells(position: Position, matrix: SudokuCell[][]) {
+export function getRelatedCells(position: Position, matrix: SudokuCell[][]) {
   const result: SudokeCellWithPosition[] = [];
   matrix.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
