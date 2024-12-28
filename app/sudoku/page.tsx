@@ -11,6 +11,7 @@ import { isSudokuFinished } from '../utils/sudoku-utils';
 import { CongratsModal } from '../ui/sudoku/congrats-modal';
 import { DefaultSudokuContext } from '../context/sudoku-context';
 import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
+import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY } from '../const';
 
 export default function Page() {
   const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
@@ -35,7 +36,14 @@ export default function Page() {
         console.error(err);
       }
     }
-    fetchData();
+    // read from local storage
+    const sudokuData = localStorage.getItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY);
+    console.log(sudokuData);
+    if (sudokuData) {
+      setSudokuInternal(JSON.parse(sudokuData));
+    } else {
+      fetchData();
+    }
   }, []);
 
   function setSudoku(...arg: Parameters<typeof setSudokuInternal>) {
@@ -44,28 +52,10 @@ export default function Page() {
     }
     setSudokuInternal(...arg);
   }
-  //   if (savedData) {
-  //     try {
-  //       setSudokuDataInternal(JSON.parse(savedData));
-  //     } catch (e) {
-  //       console.error("Failed to parse saved data");
-  //     }
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem(
-  //     LOCAL_STORAGE_KEY_SUDOKU_DATA,
-  //     JSON.stringify(sudokuData)
-  //   );
-  // });
-  // useEffect(() => {
-  //   localStorage.setItem(
-  //     LOCAL_STORAGE_KEY_SUDOKU_CONTEXT,
-  //     JSON.stringify(sudokuContext)
-  //   );
-  // });
-
+  useEffect(() => {
+    console.log('save sudoku to local storage');
+    localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
+  }, [sudoku]);
   // ------------------------ START: sudoku data operation -------------------------------
   function fillAllCandidates() {
     setSudoku((sudoku) => {
