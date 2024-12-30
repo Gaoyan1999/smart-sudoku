@@ -81,6 +81,6 @@ export function isSudokuFinished(matrix: SudokuCell[][]) {
 }
 
 
-export function isValidCell(cell: SudokuCell) {
+export function isAnsweredCell(cell: SudokuCell) {
   return cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer);
 }
