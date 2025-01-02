@@ -17,7 +17,7 @@ export function fillAllCandidate(matrix: SudokuData['matrix']) {
   return matrix;
 }
 
-function findMissingNumbers(nums: number[]) {
+export function findMissingNumbers(nums: number[]) {
   const results: number[] = [];
   for (let i = 1; i <= 9; i++) {
     if (!nums.includes(i)) {
