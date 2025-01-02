@@ -40,6 +40,8 @@ export function ToolArea({
       setIsVisible(false);
     }
   }, [mode, hint]);
+  const disabledHint =
+    sudoku.context.isFinished || sudoku.context.isPause || sudoku.context.mode === 'hint';
 
   return (
     <div>
@@ -54,24 +56,26 @@ export function ToolArea({
           <DriveFileRenameOutlineIcon sx={{ color: mode === 'normal' ? undefined : indigo[700] }} />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Hint" onClick={getHint}>
-        <IconButton>
-          <QuestionMarkIcon sx={{ color: yellow[800] }} />
-        </IconButton>
+      <Tooltip title="Hint">
+        <span>
+          <IconButton onClick={getHint} disabled={disabledHint}>
+            <QuestionMarkIcon sx={{ color: disabledHint ? undefined : yellow[800] }} />
+          </IconButton>
+        </span>
       </Tooltip>
       {/* Hint scope */}
       {mode === 'hint' && hint ? (
-        <div className={`bg-neutral-200 p-2 rounded-md ${isVisible ? 'animate-fade-in' : 'animate-fade-out'}`}>
-          <div>
-            {hint.hintMessage}            
-          </div>
+        <div
+          className={`bg-neutral-200 p-2 rounded-md ${isVisible ? 'animate-fade-in' : 'animate-fade-out'}`}
+        >
+          <div>{hint.hintMessage}</div>
           <div className="flex justify-end">
-              <IconButton onClick={rejectHint}>
-                <CancelIcon sx={{ color: red[700] }} />
-              </IconButton>
-              <IconButton onClick={applyHint}>
-                <CheckCircleIcon sx={{ color: green[500] }} />
-              </IconButton>
+            <IconButton onClick={rejectHint}>
+              <CancelIcon sx={{ color: red[700] }} />
+            </IconButton>
+            <IconButton onClick={applyHint}>
+              <CheckCircleIcon sx={{ color: green[500] }} />
+            </IconButton>
           </div>
         </div>
       ) : null}

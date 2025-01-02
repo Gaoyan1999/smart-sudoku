@@ -2,12 +2,12 @@
 import './page.css';
 import { KeyboardEventHandler, useState, useEffect } from 'react';
 import { Sudoku } from '../types/sudoku';
-import { remove, throttle } from 'lodash';
+import { remove, throttle, uniq } from 'lodash';
 import { constructSudoku, getDefaultSudoku } from './sudoku';
 import { getRelatedCells } from '../utils/location';
 import { ToolArea } from '../ui/sudoku/tool-area';
 import { MainPlayground } from '../ui/sudoku/main-playground';
-import { fillAllCandidate } from '../utils/sudoku-utils';
+import { fillAllCandidate, findMissingNumbers } from '../utils/sudoku-utils';
 import { isSudokuFinished } from '../utils/sudoku-utils';
 import { CongratsModal } from '../ui/sudoku/congrats-modal';
 import { DefaultSudokuContext } from '../context/sudoku-context';
@@ -102,16 +102,6 @@ export default function Page() {
     const { rowIndex, colIndex } = sudoku.context.selectedPosition;
     if (sudoku.context.mode === 'normal') {
       setCellValue(rowIndex, colIndex, num);
-      // check the sudoku is finished
-      if (isSudokuFinished(sudoku.data.matrix)) {
-        setSudoku((sudoku) => ({
-          ...sudoku,
-          context: { ...sudoku.context, isFinished: true },
-        }));
-        setTimeout(() => {
-          setShowCongrats(true);
-        }, 100);
-      }
     } else {
       setNotingCandidates(rowIndex, colIndex, num);
     }
@@ -144,6 +134,16 @@ export default function Page() {
         },
       };
     });
+
+    if (isSudokuFinished(sudoku.data.matrix)) {
+      setSudoku((sudoku) => ({
+        ...sudoku,
+        context: { ...sudoku.context, isFinished: true },
+      }));
+      setTimeout(() => {
+        setShowCongrats(true);
+      }, 100);
+    }
   }
 
   function setNotingCandidates(rowIndex: number, colIndex: number, candidateNumber: number) {
@@ -187,11 +187,21 @@ export default function Page() {
   function resetSudoku() {
     setSudoku((sudoku) => {
       const matrix = sudoku.data.matrix;
-      matrix.forEach((row) => {
-        row.forEach((col) => {
-          if (col.type !== 'known') {
-            col.value = 0;
-            col.notingCandidates = [];
+      matrix.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell.type !== 'known') {
+            cell.value = 0;
+            cell.notingCandidates = [];
+          }
+
+          if (cell.type === 'unknown') {
+            cell.actualCandidates = findMissingNumbers(
+              uniq(
+                getRelatedCells({ rowIndex, colIndex }, matrix)
+                  .filter((cell) => cell.value !== 0)
+                  .map((cell) => cell.value)
+              )
+            );
           }
         });
       });
@@ -225,6 +235,9 @@ export default function Page() {
 
   const handleKeyDown: KeyboardEventHandler = throttle((event) => {
     const code = event.code;
+    if (sudoku.context.isFinished) {
+      return;
+    }
     if (sudoku.context.isPause && code !== 'Space') {
       return;
     }
