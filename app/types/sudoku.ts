@@ -50,8 +50,8 @@ export type Sudoku = {
 export type SudokuHint = {
   position: Position;
   ruleType: 'fillCellDirectly' | 'excludeCandidate';
-  rule: 'onlyOneCandidate';
+  rule: 'soleCandidate' | 'uniqueSolution';
   answer?: number;
-  relatedCells: SudokeCellWithPosition[];
+  highlightCells: SudokeCellWithPosition[];
   hintMessage: string;
 };

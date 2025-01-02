@@ -1,13 +1,13 @@
 import { SudokuCell, SudokuData } from '../types/sudoku';
 import { uniq } from 'lodash';
-import { getRelateCells } from './location';
+import { getRelatedCells } from './location';
 
 export function fillAllCandidate(matrix: SudokuData['matrix']) {
   matrix.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       cell.notingCandidates = findMissingNumbers(
         uniq(
-          getRelateCells({ rowIndex, colIndex }, matrix)
+          getRelatedCells({ rowIndex, colIndex }, matrix)
             .filter((cell) => cell.value !== 0)
             .map((cell) => cell.value)
         )
@@ -60,7 +60,7 @@ export function initMatrix(mission: string, solution: string): SudokuCell[][] {
       if (cell.type === 'unknown') {
         cell.actualCandidates = findMissingNumbers(
           uniq(
-            getRelateCells({ rowIndex, colIndex }, maxtrix)
+            getRelatedCells({ rowIndex, colIndex }, maxtrix)
               .filter((cell) => cell.value !== 0)
               .map((cell) => cell.value)
           )
@@ -81,6 +81,6 @@ export function isSudokuFinished(matrix: SudokuCell[][]) {
 }
 
 
-export function isValidCell(cell: SudokuCell) {
+export function isAnsweredCell(cell: SudokuCell) {
   return cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer);
 }

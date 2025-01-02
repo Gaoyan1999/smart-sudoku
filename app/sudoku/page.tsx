@@ -4,7 +4,7 @@ import { KeyboardEventHandler, useState, useEffect } from 'react';
 import { Sudoku } from '../types/sudoku';
 import { remove, throttle } from 'lodash';
 import { constructSudoku, getDefaultSudoku } from './sudoku';
-import { getRelateCells } from '../utils/location';
+import { getRelatedCells } from '../utils/location';
 import { ToolArea } from '../ui/sudoku/tool-area';
 import { MainPlayground } from '../ui/sudoku/main-playground';
 import { fillAllCandidate } from '../utils/sudoku-utils';
@@ -112,10 +112,6 @@ export default function Page() {
           setShowCongrats(true);
         }, 100);
       }
-      // remove the candidate numbers in related cells.
-      getRelateCells({ rowIndex, colIndex }, sudoku.data.matrix).filter((cell) => {
-        remove(cell.notingCandidates, (value) => value === num);
-      });
     } else {
       setNotingCandidates(rowIndex, colIndex, num);
     }
@@ -124,6 +120,17 @@ export default function Page() {
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
+    const isCorrect = cell.realAnswer === val;
+    // remove the candidate numbers in related cells.
+    if (isCorrect) {
+      cell.actualCandidates = [];
+      cell.notingCandidates = [];
+      getRelatedCells({ rowIndex, colIndex }, sudoku.data.matrix).forEach((cell) => {
+        remove(cell.notingCandidates, (value) => value === val);
+        remove(cell.actualCandidates, (value) => value === val);
+      });
+    }
+
     if (cell.type !== 'unknown' || val < 0 || val > 9) {
       return;
     }

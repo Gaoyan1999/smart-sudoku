@@ -60,7 +60,7 @@ export function MainPlayground({
             'normal-mode-cell' +
             (isHintMode
               ? classNames({
-                  'bg-blue-600 text-white': !!hint.relatedCells.find(
+                  'bg-blue-600 text-white': !!hint.highlightCells.find(
                     (relatedCell) =>
                       relatedCell.position.rowIndex === rowIndex &&
                       relatedCell.position.colIndex === colIndex
