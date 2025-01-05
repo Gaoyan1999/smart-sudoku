@@ -1,7 +1,7 @@
 'use client';
 import './page.css';
 import { KeyboardEventHandler, useState, useEffect } from 'react';
-import { Sudoku } from '../types/sudoku';
+import { Sudoku, SudokuDifficulty } from '../types/sudoku';
 import { remove, throttle, uniq } from 'lodash';
 import { constructSudoku, getDefaultSudoku } from './sudoku';
 import { getRelatedCells } from '../utils/location';
@@ -26,7 +26,7 @@ export default function Page() {
           ...sudoku,
           context: { ...sudoku.context, isLoading: true },
         }));
-        const puzzleData = await fetchNewSudokuPuzzleApi('Expert');
+        const puzzleData = await fetchNewSudokuPuzzleApi('Easy');
         if (puzzleData) {
           setSudokuInternal(constructSudoku(puzzleData));
           setSudokuInternal((sudoku) => ({
@@ -182,6 +182,25 @@ export default function Page() {
         },
       };
     });
+  }
+
+  async function setDifficulty(difficulty: SudokuDifficulty) {
+    if (
+      !confirm(
+        `Are you sure you want to change difficulty to ${difficulty}? Current progress will be lost.`
+      )
+    ) {
+      return;
+    }
+    setSudokuInternal((sudoku) => ({
+      ...sudoku,
+      context: { ...sudoku.context, isLoading: true },
+    }));
+    const puzzleData = await fetchNewSudokuPuzzleApi(difficulty);
+    
+    if (puzzleData) {
+      setSudokuInternal(constructSudoku(puzzleData));
+    }
   }
 
   function resetSudoku() {
@@ -349,7 +368,14 @@ export default function Page() {
         }}
       >
         <div>
-          {<MainPlayground sudoku={sudoku} setPosition={setPosition} resetSudoku={resetSudoku} />}
+          {
+            <MainPlayground
+              sudoku={sudoku}
+              setPosition={setPosition}
+              resetSudoku={resetSudoku}
+              setDifficulty={setDifficulty}
+            />
+          }
         </div>
         <div>
           <ToolArea

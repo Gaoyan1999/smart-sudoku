@@ -1,7 +1,7 @@
 import './main-playground.css';
 import { classNames } from '../../utils/common';
 import { isRelatedCell } from '../../utils/location';
-import { Sudoku } from '../../types/sudoku';
+import { Sudoku, SudokuDifficulty } from '../../types/sudoku';
 import { NotingCell } from './noting-cell';
 import { useContext } from 'react';
 import { DefaultSudokuContext } from '../../context/sudoku-context';
@@ -14,10 +14,12 @@ export function MainPlayground({
   sudoku,
   setPosition,
   resetSudoku,
+  setDifficulty,
 }: {
   sudoku: Sudoku;
   setPosition: (rowIndex: number, colIndex: number) => void;
   resetSudoku: () => void;
+  setDifficulty: (difficulty: SudokuDifficulty) => void;
 }) {
   const { togglePause } = useContext(DefaultSudokuContext);
   const { matrix } = sudoku.data;
@@ -85,8 +87,12 @@ export function MainPlayground({
 
   return (
     <>
-      <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} />
-      <div className="relative">
+      <InformationBar        
+        sudoku={sudoku}
+        resetSudoku={resetSudoku}
+        setDifficulty={setDifficulty}
+      />
+      <div className="relative mt-1">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
             <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: '60px' }} />
