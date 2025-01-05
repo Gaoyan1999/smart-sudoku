@@ -81,7 +81,7 @@ export function ToolArea({
       ) : null}
 
       {/* number input grid */}
-      <div className="grid grid-cols-3 gap-1 mt-2 max-w-[400px]">
+      <div className="grid grid-cols-3 gap-1 mt-2 max-w-[200px]">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
           <button
             key={number}
