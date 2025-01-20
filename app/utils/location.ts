@@ -1,5 +1,5 @@
 import { uniqBy } from 'lodash';
-import { Position, SudokeCellWithPosition, SudokuCell } from '../types/sudoku';
+import { Position, SudokuCellWithPosition, SudokuCell, SudokuData } from '../types/sudoku';
 
 export function isRelatedCell(targetA: Position, targetB: Position): boolean {
   // Check if either targetA or targetB is not defined
@@ -32,7 +32,7 @@ function isInSameColumn(posA: Position, posB: Position): boolean {
   return posA.colIndex === posB.colIndex;
 }
 
-function isInSameBlock(posA: Position, posB: Position): boolean {
+export function isInSameBlock(posA: Position, posB: Position): boolean {
   const blockStartRowIndex = Math.floor(posA.rowIndex / 3) * 3;
   const blockStartColIndex = Math.floor(posA.colIndex / 3) * 3;
 
@@ -45,7 +45,7 @@ function isInSameBlock(posA: Position, posB: Position): boolean {
 }
 
 export function getRelatedCells(position: Position, matrix: SudokuCell[][]) {
-  const result: SudokeCellWithPosition[] = [];
+  const result: SudokuCellWithPosition[] = [];
   // block first, and then row and column
   const blockCells = getCellsInSameBlock(position, matrix);
   const rowCells = getCellsInSameRow(position, matrix);
@@ -57,7 +57,7 @@ export function getRelatedCells(position: Position, matrix: SudokuCell[][]) {
 export function getCellsInSameRow(
   position: Position,
   matrix: SudokuCell[][]
-): SudokeCellWithPosition[] {
+): SudokuCellWithPosition[] {
   return matrix[position.rowIndex]
     .map((cell, colIndex) => ({
       ...cell,
@@ -69,8 +69,8 @@ export function getCellsInSameRow(
 export function getCellsInSameColumn(
   position: Position,
   matrix: SudokuCell[][]
-): SudokeCellWithPosition[] {
-  const result: SudokeCellWithPosition[] = [];
+): SudokuCellWithPosition[] {
+  const result: SudokuCellWithPosition[] = [];
   for (let i = 0; i < matrix.length; i++) {
     if (i === position.rowIndex) {
       continue;
@@ -86,10 +86,10 @@ export function getCellsInSameColumn(
 export function getCellsInSameBlock(
   position: Position,
   matrix: SudokuCell[][]
-): SudokeCellWithPosition[] {
+): SudokuCellWithPosition[] {
   const blockStartRowIndex = Math.floor(position.rowIndex / 3) * 3;
   const blockStartColIndex = Math.floor(position.colIndex / 3) * 3;
-  const result: SudokeCellWithPosition[] = [];
+  const result: SudokuCellWithPosition[] = [];
   for (let i = blockStartRowIndex; i < blockStartRowIndex + 3; i++) {
     for (let j = blockStartColIndex; j < blockStartColIndex + 3; j++) {
       if (i === position.rowIndex && j === position.colIndex) {
@@ -99,4 +99,25 @@ export function getCellsInSameBlock(
     }
   }
   return result;
+}
+
+export function getBlock(
+  matrix: SudokuData['matrix'],
+  blockIndex: number
+): SudokuCellWithPosition[][] {
+  const rowOffset = Math.floor(blockIndex / 3) * 3;
+  const colOffset = (blockIndex % 3) * 3;  
+  const block: SudokuCellWithPosition[][] = [];
+  if (blockIndex < 0 || blockIndex > 8) {
+    throw Error('Invalid block index');
+  }
+  for (let i = 0; i < 3; i++) {
+    block.push(
+      matrix[rowOffset + i].slice(colOffset, colOffset + 3).map((cell, j) => ({
+        ...cell,
+        position: { rowIndex: rowOffset + i, colIndex: colOffset + j },
+      }))
+    );
+  }
+  return block;
 }

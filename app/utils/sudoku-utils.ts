@@ -1,4 +1,4 @@
-import { SudokuCell, SudokuData } from '../types/sudoku';
+import { Position, SudokuCell, SudokuData } from '../types/sudoku';
 import { uniq } from 'lodash';
 import { getRelatedCells } from './location';
 
@@ -64,7 +64,7 @@ export function initMatrix(mission: string, solution: string): SudokuCell[][] {
               .filter((cell) => cell.value !== 0)
               .map((cell) => cell.value)
           )
-        )
+        );
       }
     });
   });
@@ -80,7 +80,14 @@ export function isSudokuFinished(matrix: SudokuCell[][]) {
   );
 }
 
-
 export function isAnsweredCell(cell: SudokuCell) {
   return cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer);
+}
+
+export function renderCellPosition(position: Position) {
+  return `(${position.rowIndex + 1},${position.colIndex + 1})`;
+}
+
+export function renderCellPositions(positions: Position[]) {
+  return positions.map((position) => renderCellPosition(position)).join(',');
 }

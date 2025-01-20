@@ -33,10 +33,8 @@ export function ToolArea({
 
   useEffect(() => {
     if (mode === 'hint' && hint) {
-      console.log('hint is visible');
       setIsVisible(true);
     } else {
-      console.log('hint is not visible');
       setIsVisible(false);
     }
   }, [mode, hint]);

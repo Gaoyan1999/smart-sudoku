@@ -8,7 +8,7 @@ export type SudokuCell = {
   actualCandidates: number[];
   type: 'known' | 'unknown' | 'errorAnswer';
 };
-export type SudokeCellWithPosition = SudokuCell & {
+export type SudokuCellWithPosition = SudokuCell & {
   position: Position;
 };
 
@@ -50,8 +50,9 @@ export type Sudoku = {
 export type SudokuHint = {
   position: Position;
   ruleType: 'fillCellDirectly' | 'excludeCandidate';
-  rule: 'soleCandidate' | 'uniqueSolution';
+  rule: 'soleCandidate' | 'uniqueSolution' | 'intersectionElimination';
   answer?: number;
-  highlightCells: SudokeCellWithPosition[];
+  highlightCells: SudokuCellWithPosition[];
   hintMessage: string;
 };
+
