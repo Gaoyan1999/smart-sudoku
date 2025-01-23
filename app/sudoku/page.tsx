@@ -50,7 +50,7 @@ export default function Page() {
   }, []);
 
   function setSudoku(...arg: Parameters<typeof setSudokuInternal>) {
-    if (sudoku.context.isPause || sudoku.context.isLoading) {
+    if (sudoku.context.isPause || sudoku.context.isLoading || sudoku.context.mode === 'hint') {
       return;
     }
     setSudokuInternal(...arg);
@@ -197,7 +197,7 @@ export default function Page() {
       context: { ...sudoku.context, isLoading: true },
     }));
     const puzzleData = await fetchNewSudokuPuzzleApi(difficulty);
-    
+
     if (puzzleData) {
       setSudokuInternal(constructSudoku(puzzleData));
     }
@@ -319,19 +319,29 @@ export default function Page() {
       alert('No hint found');
       return;
     }
-    setSudokuInternal((sudoku) => ({
-      ...sudoku,
-      context: { ...sudoku.context, hint, mode: 'hint', selectedPosition: hint.position },
-    }));
+    if (hint.ruleType === 'fillCellDirectly') {
+      setSudokuInternal((sudoku) => ({
+        ...sudoku,
+        context: { ...sudoku.context, hint, mode: 'hint', selectedPosition: hint.position },
+      }));
+    } else {
+      setSudokuInternal((sudoku) => ({
+        ...sudoku,
+        context: { ...sudoku.context, hint, mode: 'hint', selectedPosition: undefined },
+      }));
+    }
   }
 
   function applyHint() {
     if (!sudoku.context.hint) {
       return;
     }
-    const { answer, position, ruleType } = sudoku.context.hint;
-    if (answer && ruleType === 'fillCellDirectly') {
+    const { ruleType } = sudoku.context.hint;
+    if (ruleType === 'fillCellDirectly') {
+      const { position, answer } = sudoku.context.hint;
       setCellValue(position.rowIndex, position.colIndex, answer);
+    } else {
+      // TODO: implement exclude candidate
     }
     clearHint();
   }

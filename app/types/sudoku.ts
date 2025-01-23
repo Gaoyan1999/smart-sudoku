@@ -47,12 +47,30 @@ export type Sudoku = {
   context: SudokuContext;
 };
 
-export type SudokuHint = {
-  position: Position;
-  ruleType: 'fillCellDirectly' | 'excludeCandidate';
-  rule: 'soleCandidate' | 'uniqueSolution' | 'intersectionElimination';
-  answer?: number;
-  highlightCells: SudokuCellWithPosition[];
-  hintMessage: string;
-};
-
+export type SudokuHint =
+  | {
+      position: Position;
+      ruleType: 'fillCellDirectly';
+      rule: 'soleCandidate' | 'uniqueSolution';
+      answer: number;
+      secondaryCells: SudokuCellWithPosition[];
+      hintMessage: string;
+      highlightUnits: {
+        type: 'row' | 'column' | 'block';
+        index: number;
+        hasBorder: boolean;
+      }[];
+    }
+  | {
+      primaryCells: SudokuCellWithPosition[];
+      secondaryCells: SudokuCellWithPosition[];
+      highlightUnits: {
+        type: 'row' | 'column' | 'block';
+        index: number;
+        hasBorder: boolean;        
+      }[];
+      ruleType: 'excludeCandidate';
+      rule: 'intersectionElimination';
+      excludeNumber: number;
+      hintMessage: string;
+    };
