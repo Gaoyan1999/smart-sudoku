@@ -43,7 +43,8 @@ function isSoleCandidate(matrix: SudokuData['matrix']): SudokuHint | undefined {
           ruleType: 'fillCellDirectly',
           rule: 'soleCandidate',
           answer,
-          highlightCells: relatedCellsResult,
+          secondaryCells: relatedCellsResult,
+          highlightUnits: [],
           hintMessage: `There is only one candidate number: ${answer} in the cell at (${i + 1}, ${j + 1})`,
         };
       }
@@ -85,10 +86,11 @@ function isUniqueSolution(matrix: SudokuData['matrix']): SudokuHint | undefined 
       ruleType: 'fillCellDirectly',
       rule: 'uniqueSolution',
       answer: uniqueCandidate,
-      highlightCells: uniqBy(
+      secondaryCells: uniqBy(
         highlightCells,
         (cell) => `${cell.position.rowIndex}-${cell.position.colIndex}`
       ),
+      highlightUnits: [],
       hintMessage: `There is only one solution for the ${type} at (${targetCell.position.rowIndex + 1}, ${targetCell.position.colIndex + 1})`,
     };
   }
@@ -163,10 +165,23 @@ function blockColumnRowIntersectionElimination(
           const lineIndex = isInSameRow ? rowIndex : colIndex;
 
           return {
-            position: cells[0].position,
             ruleType: 'excludeCandidate',
             rule: 'intersectionElimination',
-            highlightCells: [],
+            excludeNumber: candidate,
+            primaryCells: candidateCells,
+            secondaryCells: cells,
+            highlightUnits: [
+              {
+                type: 'block',
+                index: blockIndex,
+                hasBorder: true,
+              },
+              {
+                type: lineType,
+                index: lineIndex,
+                hasBorder: false,
+              },
+            ],
             hintMessage: `In block ${blockIndex + 1}, number ${candidate} can only be placed in cells ${renderCellPositions(cells.map((c) => c.position))},
              then Number: ${candidate} cannot appear in any other cells in ${lineType} ${lineIndex + 1},
              so candidate ${candidate} can be removed from ${renderCellPositions(candidateCells.map((c) => c.position))}.`,

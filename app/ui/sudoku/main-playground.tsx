@@ -10,6 +10,17 @@ import { blue } from '@mui/material/colors';
 import { InformationBar } from './information-bar';
 import { isEqual } from 'lodash';
 
+function getBlockPosition(blockIndex: number) {
+  // 计算 block 的行和列位置 (0-2)
+  const blockRow = Math.floor(blockIndex / 3);
+  const blockCol = blockIndex % 3;
+
+  return {
+    top: `${blockRow * 33.33}%`,
+    left: `${blockCol * 33.33}%`,
+  };
+}
+
 export function MainPlayground({
   sudoku,
   setPosition,
@@ -43,18 +54,31 @@ export function MainPlayground({
     const { rowIndex, colIndex } = selectedPosition;
     return matrix[rowIndex][colIndex];
   }
-  function isTargetCellInHintMode(rowIndex: number, colIndex: number) {
+  function isCellInHintMode(rowIndex: number, colIndex: number) {
     if (!hint) return false;
-    return hint.position.rowIndex === rowIndex && hint.position.colIndex === colIndex;
+    const { ruleType } = hint;
+    if (ruleType === 'fillCellDirectly') {
+      const { position } = hint;
+      return position.rowIndex === rowIndex && position.colIndex === colIndex;
+    } else {
+      return false;
+    }
   }
 
   function renderCellNode(rowIndex: number, colIndex: number) {
     const cell = matrix[rowIndex][colIndex];
     const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
-    if (isTargetCellInHintMode(rowIndex, colIndex)) {
-      return <div className="normal-mode-cell text-white animate-hint-flash">{hint?.answer}</div>;
+    if (isCellInHintMode(rowIndex, colIndex) && hint?.ruleType === 'fillCellDirectly') {
+      return <div className="normal-mode-cell text-white animate-hint-flash">{hint.answer}</div>;
     } else if (showNotingCell) {
-      return <NotingCell selectNumber={selectedValue} notingNumbers={cell.notingCandidates} />;
+      return (
+        <NotingCell
+          selectNumber={selectedValue}
+          notingNumbers={cell.notingCandidates}
+          hint={hint}
+          position={{ rowIndex, colIndex }}
+        />
+      );
     } else {
       return (
         <div
@@ -62,7 +86,7 @@ export function MainPlayground({
             'normal-mode-cell' +
             (isHintMode
               ? classNames({
-                  'bg-blue-600 text-white': !!hint.highlightCells.find(
+                  'bg-blue-600 text-white': !!hint.secondaryCells.find(
                     (relatedCell) =>
                       relatedCell.position.rowIndex === rowIndex &&
                       relatedCell.position.colIndex === colIndex
@@ -85,13 +109,81 @@ export function MainPlayground({
     }
   }
 
+  // 示例：假设我们要高亮第 n 个 block（这里用 4 作为示例，表示中间的 block）
+
+  function renderHighlightBlockUnits() {
+    if (!isHintMode || !hint?.highlightUnits?.length) return null;
+
+    const blockUnits = hint.highlightUnits.filter((unit) => unit.type === 'block');
+    if (!blockUnits.length) return null;
+
+    return blockUnits.map((unit) => {
+      const blockPosition = getBlockPosition(unit.index);
+      return (
+        <div
+          key={unit.index}
+          className={classNames({
+            'absolute w-[33.33%] h-[33.33%] border-2 border-red-500 pointer-events-none bg-blue-200/30 -z-10':
+              unit.hasBorder,
+            'absolute w-[33.33%] h-[33.33%] pointer-events-none bg-blue-200/30 -z-10':
+              !unit.hasBorder,
+          })}
+          style={{
+            top: blockPosition.top,
+            left: blockPosition.left,
+          }}
+        ></div>
+      );
+    });
+  }
+
+  function renderHighlightRowUnits() {
+    if (!isHintMode || !hint?.highlightUnits?.length) return null;
+
+    const rowUnits = hint.highlightUnits.filter((unit) => unit.type === 'row');
+    if (!rowUnits.length) return null;
+
+    return rowUnits.map((unit) => (
+      <div
+        key={`row-${unit.index}`}
+        className={classNames({
+          'absolute w-full border-2 border-red-500 pointer-events-none bg-blue-200/30 -z-10':
+            unit.hasBorder,
+          'absolute w-full pointer-events-none bg-blue-200/30 -z-10': !unit.hasBorder,
+        })}
+        style={{
+          top: `${(unit.index / 9) * 100}%`,
+          height: '11.11%',
+        }}
+      ></div>
+    ));
+  }
+
+  function renderHighlightColumnUnits() {
+    if (!isHintMode || !hint?.highlightUnits?.length) return null;
+
+    const columnUnits = hint.highlightUnits.filter((unit) => unit.type === 'column');
+    if (!columnUnits.length) return null;
+
+    return columnUnits.map((unit) => (
+      <div
+        key={`column-${unit.index}`}
+        className={classNames({
+          'absolute h-full border-2 border-red-500 pointer-events-none bg-blue-200/30 -z-10':
+            unit.hasBorder,
+          'absolute h-full pointer-events-none bg-blue-200/30 -z-10': !unit.hasBorder,
+        })}
+        style={{
+          left: `${(unit.index / 9) * 100}%`,
+          width: '11.11%',
+        }}
+      ></div>
+    ));
+  }
+
   return (
     <>
-      <InformationBar        
-        sudoku={sudoku}
-        resetSudoku={resetSudoku}
-        setDifficulty={setDifficulty}
-      />
+      <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} setDifficulty={setDifficulty} />
       <div className="relative mt-1">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
@@ -103,6 +195,12 @@ export function MainPlayground({
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-800"></div>
           </div>
         ) : null}
+        {/* highlight unit: block */}
+        {renderHighlightBlockUnits()}
+        {/* highlight unit: row */}
+        {renderHighlightRowUnits()}
+        {/* highlight unit: column */}
+        {renderHighlightColumnUnits()}
         <table className={classNames({ 'sudoku-table': true, 'bg-neutral-100': isLoading })}>
           <tbody>
             {matrix.map((row, rowIndex) => (
@@ -114,7 +212,7 @@ export function MainPlayground({
                     : undefined
                 }
               >
-                {row.map((cell, colIndex) => {
+                {row.map((_, colIndex) => {
                   const isRightBorder = colIndex === 2 || colIndex === 5;
                   return (
                     <td
@@ -136,13 +234,22 @@ export function MainPlayground({
                           // handle background color
                           className={
                             isHintMode
-                              ? classNames({
-                                  'bg-green-700': isEqual(hint.position, { rowIndex, colIndex }),
-                                  'bg-blue-200': isRelatedCell(hint.position, {
-                                    rowIndex,
-                                    colIndex,
-                                  }),
-                                })
+                              ? hint?.ruleType === 'fillCellDirectly'
+                                ? classNames({
+                                    'bg-green-700': isEqual(hint.position, { rowIndex, colIndex }),
+                                    'bg-blue-200': isRelatedCell(hint.position, {
+                                      rowIndex,
+                                      colIndex,
+                                    }),
+                                  })
+                                : classNames({
+                                    'bg-green-700': hint.primaryCells.some((c) =>
+                                      isEqual(c.position, { rowIndex, colIndex })
+                                    ),
+                                    'bg-blue-200': hint.secondaryCells.some((c) =>
+                                      isEqual(c.position, { rowIndex, colIndex })
+                                    ),
+                                  })
                               : classNames({
                                   'bg-blue-200': isSelected(rowIndex, colIndex),
                                   'bg-neutral-200':

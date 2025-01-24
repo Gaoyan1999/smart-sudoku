@@ -40,3 +40,28 @@
 .animate-hint-flash {
   animation: hint-flash 2s ease-in-out infinite;
 }
+
+.noting-cell-cross {
+  position: relative;
+}
+
+.noting-cell-cross::before,
+.noting-cell-cross::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  height: 1px;
+  margin: auto;
+}
+
+.noting-cell-cross::before {
+  transform: rotate(45deg);
+}
+
+.noting-cell-cross::after {
+  transform: rotate(-45deg);
+}
