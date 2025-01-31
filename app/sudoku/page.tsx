@@ -341,6 +341,22 @@ export default function Page() {
       const { position, answer } = sudoku.context.hint;
       setCellValue(position.rowIndex, position.colIndex, answer);
     } else {
+      const { excludeNumber, primaryCells } = sudoku.context.hint;
+      setSudokuInternal((sudoku) => {
+        const matrix = sudoku.data.matrix;
+        primaryCells.forEach((cell) => {
+          remove(
+            matrix[cell.position.rowIndex][cell.position.colIndex].notingCandidates,
+            (value) => value === excludeNumber
+          );
+          remove(
+            matrix[cell.position.rowIndex][cell.position.colIndex].actualCandidates,
+            (value) => value === excludeNumber
+          );
+        });
+        return sudoku;
+      });
+
       // TODO: implement exclude candidate
     }
     clearHint();
