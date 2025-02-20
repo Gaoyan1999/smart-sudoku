@@ -184,7 +184,7 @@ export function MainPlayground({
   return (
     <>
       <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} setDifficulty={setDifficulty} />
-      <div className="relative mt-1">
+      <div className="relative flex justify-center mt-2">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
             <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: '60px' }} />
@@ -192,7 +192,7 @@ export function MainPlayground({
         ) : null}
         {isLoading ? (
           <div className="pause-and-loading-mask">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-800"></div>
+            <div className="animate-spin rounded-full border-t-2 border-b-2 border-blue-800"></div>
           </div>
         ) : null}
         {/* highlight unit: block */}
