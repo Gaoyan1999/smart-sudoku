@@ -62,7 +62,7 @@ export function InformationBar({
           ) : (
             <Pause onClick={togglePause} sx={{ color: grey[800] }} />
           ))}
-        <span className="ml-2 w-12 font-semibold text-neutral-600 text-neutral-600">
+        <span className="ml-2 font-semibold text-neutral-600 text-neutral-600">
           {secondToHourAndMinutes(elapsedTime)}
         </span>
       </div>

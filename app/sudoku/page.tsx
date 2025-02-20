@@ -357,7 +357,7 @@ export default function Page() {
 
   return (
     <div
-      className="p-4 flex h-full relative space-x-4"
+      className="px-2 py-4 flex flex-col md:flex-row h-full relative md:space-x-4 space-y-4 md:space-y-0"
       style={{ outline: 'none' }}
       tabIndex={1}
       onKeyDown={handleKeyDown}
@@ -377,7 +377,7 @@ export default function Page() {
           togglePause,
         }}
       >
-        <div>
+        <div className="flex-shrink-0 flex-grow">
           {
             <MainPlayground
               sudoku={sudoku}
@@ -387,7 +387,7 @@ export default function Page() {
             />
           }
         </div>
-        <div>
+        <div className="flex-shrink-0">
           <ToolArea
             sudoku={sudoku}
             showAllCandidates={fillAllCandidates}

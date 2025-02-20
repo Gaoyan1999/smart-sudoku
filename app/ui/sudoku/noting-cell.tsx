@@ -22,7 +22,7 @@ export function NotingCell({
     <div className={classNames({ 'noting-cell': true, 'bg-blue-600': isSecondaryCellInHintMode })}>
       {range(1, 10).map((i) => {
         if (!notingNumbers.includes(i)) {
-          return <div key={i}></div>;
+          return <div className="flex items-center justify-center" key={i}></div>;
         }
         const needHint =
           hint &&
@@ -35,13 +35,11 @@ export function NotingCell({
         return (
           <div
             key={i}
-            className={
-              needHint
-                ? 'bg-red-600 text-white animate-hint-flash noting-cell-cross'
-                : classNames({
-                    'bg-blue-600 text-white': i === selectNumber || isSecondaryCellInHintMode,
-                  })
-            }
+            className={classNames({
+              'flex items-center justify-center': true,
+              'bg-red-600 text-white animate-hint-flash noting-cell-cross': !!needHint,
+              'bg-blue-600 text-white': i === selectNumber || isSecondaryCellInHintMode,
+            })}
           >
             {i}
           </div>
