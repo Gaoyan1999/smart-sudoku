@@ -181,6 +181,60 @@ export function MainPlayground({
     ));
   }
 
+  function renderSudokuBorders() {
+    return (
+      <>
+        {/* Outer border - all 4 sides */}
+        {/* Top border */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-black pointer-events-none z-10" />
+        {/* Bottom border */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black pointer-events-none z-10" />
+        {/* Left border */}
+        <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-black pointer-events-none z-10" />
+        {/* Right border */}
+        <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-black pointer-events-none z-10" />
+
+        {/* Block separator borders - thick lines */}
+        {/* Vertical lines at 33.33% and 66.66% */}
+        <div
+          className="absolute top-0 bottom-0 w-[2px] bg-black pointer-events-none z-10"
+          style={{ left: '33.33%' }}
+        />
+        <div
+          className="absolute top-0 bottom-0 w-[2px] bg-black pointer-events-none z-10"
+          style={{ left: '66.66%' }}
+        />
+        {/* Horizontal lines at 33.33% and 66.66% */}
+        <div
+          className="absolute left-0 right-0 h-[2px] bg-black pointer-events-none z-10"
+          style={{ top: '33.33%' }}
+        />
+        <div
+          className="absolute left-0 right-0 h-[2px] bg-black pointer-events-none z-10"
+          style={{ top: '66.66%' }}
+        />
+
+        {/* Cell borders - thin gray lines */}
+        {/* Vertical cell borders */}
+        {[1, 2, 4, 5, 7, 8].map((colIndex) => (
+          <div
+            key={`v-cell-${colIndex}`}
+            className="absolute top-0 bottom-0 w-[0.5px] bg-neutral-400 pointer-events-none z-10"
+            style={{ left: `${(colIndex / 9) * 100}%` }}
+          />
+        ))}
+        {/* Horizontal cell borders */}
+        {[1, 2, 4, 5, 7, 8].map((rowIndex) => (
+          <div
+            key={`h-cell-${rowIndex}`}
+            className="absolute left-0 right-0 h-[0.5px] bg-neutral-400 pointer-events-none z-10"
+            style={{ top: `${(rowIndex / 9) * 100}%` }}
+          />
+        ))}
+      </>
+    );
+  }
+
   return (
     <>
       <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} setDifficulty={setDifficulty} />
@@ -201,73 +255,65 @@ export function MainPlayground({
         {renderHighlightRowUnits()}
         {/* highlight unit: column */}
         {renderHighlightColumnUnits()}
-        <table className={classNames({ 'sudoku-table': true, 'bg-neutral-100': isLoading })}>
-          <tbody>
-            {matrix.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={
-                  rowIndex === 2 || rowIndex === 5
-                    ? 'border-solid border-b border-b-black'
-                    : undefined
-                }
-              >
-                {row.map((_, colIndex) => {
-                  const isRightBorder = colIndex === 2 || colIndex === 5;
-                  return (
-                    <td
-                      key={colIndex}
-                      className={
-                        'sudoku-cell' +
-                        classNames({
-                          // border setting
-                          'right-cell-border': isRightBorder,
-                          'normal-border': !isRightBorder,
-                        })
-                      }
-                      onClick={() => onTdClick(rowIndex, colIndex)}
-                    >
-                      {maskCellContent ? (
-                        <div className="noting-cell"></div>
-                      ) : (
-                        <div
-                          // handle background color
-                          className={
-                            isHintMode
-                              ? hint?.ruleType === 'fillCellDirectly'
-                                ? classNames({
-                                    'bg-green-700': isEqual(hint.position, { rowIndex, colIndex }),
-                                    'bg-blue-200': isRelatedCell(hint.position, {
-                                      rowIndex,
-                                      colIndex,
-                                    }),
-                                  })
+        <div className="relative w-full" style={{ width: 'min(100%, 600px)', aspectRatio: '1' }}>
+          {/* Sudoku borders */}
+          {renderSudokuBorders()}
+          <table className={classNames({ 'sudoku-table': true, 'bg-neutral-100': isLoading })}>
+            <tbody>
+              {matrix.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((_, colIndex) => {
+                    return (
+                      <td
+                        key={colIndex}
+                        className="sudoku-cell"
+                        onClick={() => onTdClick(rowIndex, colIndex)}
+                      >
+                        {maskCellContent ? (
+                          <div className="noting-cell"></div>
+                        ) : (
+                          <div
+                            // handle background color
+                            className={
+                              isHintMode
+                                ? hint?.ruleType === 'fillCellDirectly'
+                                  ? classNames({
+                                      'bg-green-700': isEqual(hint.position, {
+                                        rowIndex,
+                                        colIndex,
+                                      }),
+                                      'bg-blue-200': isRelatedCell(hint.position, {
+                                        rowIndex,
+                                        colIndex,
+                                      }),
+                                    })
+                                  : classNames({
+                                      'bg-green-700': hint.primaryCells.some((c) =>
+                                        isEqual(c.position, { rowIndex, colIndex })
+                                      ),
+                                      'bg-blue-200': hint.secondaryCells.some((c) =>
+                                        isEqual(c.position, { rowIndex, colIndex })
+                                      ),
+                                    })
                                 : classNames({
-                                    'bg-green-700': hint.primaryCells.some((c) =>
-                                      isEqual(c.position, { rowIndex, colIndex })
-                                    ),
-                                    'bg-blue-200': hint.secondaryCells.some((c) =>
-                                      isEqual(c.position, { rowIndex, colIndex })
-                                    ),
+                                    'bg-blue-200': isSelected(rowIndex, colIndex),
+                                    'bg-neutral-200':
+                                      !!selectedPosition &&
+                                      isRelatedCell({ rowIndex, colIndex }, selectedPosition),
                                   })
-                              : classNames({
-                                  'bg-blue-200': isSelected(rowIndex, colIndex),
-                                  'bg-neutral-200':
-                                    !!selectedPosition &&
-                                    isRelatedCell({ rowIndex, colIndex }, selectedPosition),
-                                })
-                          }
-                        >
-                          {renderCellNode(rowIndex, colIndex)}
-                        </div>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                            }
+                          >
+                            {renderCellNode(rowIndex, colIndex)}
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
