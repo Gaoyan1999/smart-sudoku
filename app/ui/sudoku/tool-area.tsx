@@ -25,7 +25,7 @@ export function ToolArea({
   rejectHint: () => void;
   applyHint: () => void;
 }) {
-  const { mode, switchMode } = useContext(DefaultSudokuContext);
+  const { mode, switchMode, isPause } = useContext(DefaultSudokuContext);
 
   const { hint } = sudoku.context;
 
@@ -83,8 +83,9 @@ export function ToolArea({
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
           <button
             key={number}
-            onClick={() => handleNumberInput(number)}
-            className="aspect-square bg-gray-100 rounded-md flex items-center justify-center text-2xl md:text-3xl p-2 md:p-3 text-blue-800 hover:bg-gray-200"
+            onClick={() => !isPause && handleNumberInput(number)}
+            className={`aspect-square bg-gray-100 rounded-md flex items-center justify-center text-2xl md:text-3xl p-2 md:p-3 text-blue-800 hover:bg-gray-200
+               ${isPause ? 'cursor-not-allowed' : 'cursor-pointer'}`}
           >
             {number}
           </button>
