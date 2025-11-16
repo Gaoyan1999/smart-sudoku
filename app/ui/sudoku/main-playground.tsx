@@ -240,7 +240,7 @@ export function MainPlayground({
       <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} setDifficulty={setDifficulty} />
       <div className="relative flex justify-center mt-2">
         {isPause ? (
-          <div className="pause-and-loading-mask cursor-pointer" onClick={togglePause}>
+          <div className="pause-and-loading-mask cursor-pointer z-[50]" onClick={togglePause}>
             <PlayCircleOutlineIcon sx={{ color: blue[800], fontSize: '60px' }} />
           </div>
         ) : null}
@@ -255,10 +255,19 @@ export function MainPlayground({
         {renderHighlightRowUnits()}
         {/* highlight unit: column */}
         {renderHighlightColumnUnits()}
-        <div className="relative w-full" style={{ width: 'min(100%, 600px)', aspectRatio: '1' }}>
+        <div
+          className="relative w-full pointer-events-none"
+          style={{ width: 'min(100%, 600px)', aspectRatio: '1' }}
+        >
           {/* Sudoku borders */}
           {renderSudokuBorders()}
-          <table className={classNames({ 'sudoku-table': true, 'bg-neutral-100': isLoading })}>
+          <table
+            className={classNames({
+              'sudoku-table': true,
+              'bg-neutral-100': isLoading,
+              'pointer-events-auto': true,
+            })}
+          >
             <tbody>
               {matrix.map((row, rowIndex) => (
                 <tr key={rowIndex}>
