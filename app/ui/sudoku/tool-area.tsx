@@ -85,7 +85,7 @@ export function ToolArea({
             key={number}
             onClick={() => !isPause && handleNumberInput(number)}
             className={`aspect-square bg-gray-100 rounded-md flex items-center justify-center text-2xl md:text-3xl p-2 md:p-3 text-blue-800 hover:bg-gray-200
-               ${isPause ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              ${isPause ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
           >
             {number}
           </button>
