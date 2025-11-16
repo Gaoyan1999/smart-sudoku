@@ -25,6 +25,31 @@ export function getDefaultSudoku(): Sudoku {
   };
 }
 
+export function getMakingNewPuzzleSudoku(): Sudoku {
+  return {
+    data: {
+      matrix: Array.from({ length: 9 }, () =>
+        Array.from({ length: 9 }, () => ({
+          value: 0,
+          realAnswer: 0,
+          notingCandidates: [],
+          actualCandidates: [],
+          type: 'unknown',
+        }))
+      ),
+      id: MOCK_SUDOKU_ID,
+      difficulty: 'Easy',
+    },
+    context: {
+      mode: 'making-new-puzzle',
+      isPause: false,
+      isLoading: false,
+      elapsedTime: 0,
+      isFinished: false,
+    },
+  };
+}
+
 export function constructSudoku(entity: SudokuPuzzleEntity): Sudoku {
   return {
     data: {
