@@ -1,12 +1,6 @@
 import { Position, SudokuCell, SudokuData } from '../types/sudoku';
 import { cloneDeep, uniq } from 'lodash';
-import {
-  getBlock,
-  getCellsInSameBlock,
-  getCellsInSameColumn,
-  getCellsInSameRow,
-  getRelatedCells,
-} from './location';
+import { getBlock, getCellsInSameColumn, getCellsInSameRow, getRelatedCells } from './location';
 
 export function fillAllCandidate(matrix: SudokuData['matrix']) {
   matrix.forEach((row, rowIndex) => {
@@ -192,6 +186,5 @@ function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] 
   }
 
   solve();
-  console.log(result.map((item) => item.solution.map((row) => row.map((cell) => cell.value))));
   return result;
 }
