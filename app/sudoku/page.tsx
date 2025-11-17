@@ -184,6 +184,22 @@ export default function Page() {
     });
   }
 
+  async function exitOwnPuzzle() {
+    if (!confirm('Are you sure you want to exit your own puzzle?')) {
+      return;
+    }
+    setSudokuInternal((sudoku) => ({
+      ...sudoku,
+      context: { ...sudoku.context, isLoading: true },
+    }));
+    // TODO: back to previous sudoku
+    const puzzleData = await fetchNewSudokuPuzzleApi('Easy');
+
+    if (puzzleData) {
+      setSudokuInternal(constructSudoku(puzzleData));
+    }
+  }
+
   async function setDifficulty(difficulty: SudokuDifficulty) {
     if (
       !confirm(
@@ -204,6 +220,7 @@ export default function Page() {
   }
 
   function resetSudoku() {
+    console.log('resetSudoku');
     setSudoku((sudoku) => {
       const matrix = sudoku.data.matrix;
       matrix.forEach((row, rowIndex) => {
@@ -227,6 +244,7 @@ export default function Page() {
       return {
         ...sudoku,
         context: {
+          ...sudoku.context,
           selectedPosition: undefined,
           elapsedTime: 0,
           isPause: false,
@@ -384,6 +402,7 @@ export default function Page() {
               setPosition={setPosition}
               resetSudoku={resetSudoku}
               setDifficulty={setDifficulty}
+              exitOwnPuzzle={exitOwnPuzzle}
             />
           }
         </div>

@@ -2,17 +2,56 @@
 
 import { Sudoku } from '@/app/types/sudoku';
 import { SudokuBody } from '@/app/ui/sudoku/sudoku-body';
-import { KeyboardEventHandler, useState } from 'react';
+import { KeyboardEventHandler, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getMakingNewPuzzleSudoku } from '../sudoku';
 import { throttle } from 'lodash';
 import { NumberInput } from '@/app/ui/sudoku/number-input';
 import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { checkSudokuValid } from '@/app/utils/sudoku-utils';
+import { checkSudokuValid, initMatrix } from '@/app/utils/sudoku-utils';
+import {
+  ID_SUDOKU_IMPORT,
+  LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU,
+  LOCAL_STORAGE_KEY_SUDOKU_HISTORY,
+} from '@/app/const';
+
+function constructSudoku(data: { mission: string; solution: string }): Sudoku {
+  return {
+    data: {
+      matrix: initMatrix(data.mission, data.solution),
+      id: ID_SUDOKU_IMPORT,
+      difficulty: 'Easy',
+    },
+    context: {
+      mode: 'normal',
+      isPause: false,
+      isLoading: false,
+      isFinished: false,
+      isImportedByUser: true,
+      elapsedTime: 0,
+    },
+  };
+}
 
 export default function Page() {
+  const router = useRouter();
   const [sudoku, setSudoku] = useState<Sudoku>(getMakingNewPuzzleSudoku);
+  // load data from local storage.
+  useEffect(() => {
+    const sudokuDataStr = localStorage.getItem(LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU);
+    if (sudokuDataStr) {
+      const sudokuData = JSON.parse(sudokuDataStr) as Sudoku;
+      setSudoku(sudokuData);
+    } else {
+      setSudoku(getMakingNewPuzzleSudoku);
+    }
+  }, []);
+  // watch the sudoku data
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU, JSON.stringify(sudoku));
+  }, [sudoku]);
   function setPosition(rowIndex: number, colIndex: number) {
     setSudoku((sudoku) => {
       return {
@@ -98,10 +137,19 @@ export default function Page() {
   }
 
   function handleFinishMaking() {
-    const { isValid, errorMessage } = checkSudokuValid(sudoku.data.matrix);
+    const { isValid, errorMessage, data } = checkSudokuValid(sudoku.data.matrix);
     if (!isValid) {
       alert(errorMessage);
       return;
+    }
+    // popup a dialog: saying that the sudoku is valid, and ask user to confirm if they want to play this sudoku.
+    if (confirm('The sudoku is valid, and ask user to confirm if they want to play this sudoku.')) {
+      // save the sudoku to local storage and navigate to main sudoku page
+      const { mission, solution } = data!;
+      const sudoku = constructSudoku({ mission, solution });
+      console.log('sudoku', sudoku);
+      localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
+      router.push('/sudoku');
     }
   }
 
