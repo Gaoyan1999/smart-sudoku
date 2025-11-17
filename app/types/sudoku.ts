@@ -19,7 +19,7 @@ export type SudokuData = {
 };
 
 export type SudokuContext = {
-  mode: 'normal' | 'noting' | 'hint';
+  mode: 'normal' | 'noting' | 'hint' | 'making-new-puzzle';
   isPause: boolean;
   isLoading: boolean;
   isFinished: boolean;
@@ -67,7 +67,7 @@ export type SudokuHint =
       highlightUnits: {
         type: 'row' | 'column' | 'block';
         index: number;
-        hasBorder: boolean;        
+        hasBorder: boolean;
       }[];
       ruleType: 'excludeCandidate';
       rule: 'intersectionElimination';
