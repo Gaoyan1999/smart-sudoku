@@ -6,12 +6,10 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { blue } from '@mui/material/colors';
 import { InformationBar } from './information-bar';
 import { SudokuBody } from './sudoku-body';
-import { Timer } from '../timer';
 
 export function MainPlayground({
   sudoku,
   setPosition,
-  resetSudoku,
   setDifficulty,
   exitOwnPuzzle,
 }: {
