@@ -10,6 +10,9 @@ import { Sudoku } from '@/app/types/sudoku';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { NumberInput } from './number-input';
+import BackspaceIcon from '@mui/icons-material/Backspace';
+import { Replay } from '@mui/icons-material';
+import { grey } from '@mui/material/colors';
 
 export function ToolArea({
   sudoku,
@@ -18,6 +21,8 @@ export function ToolArea({
   getHint,
   rejectHint,
   applyHint,
+  handleDeleteCell,
+  resetSudoku,
 }: {
   sudoku: Sudoku;
   showAllCandidates: () => void;
@@ -25,6 +30,8 @@ export function ToolArea({
   getHint: () => void;
   rejectHint: () => void;
   applyHint: () => void;
+  handleDeleteCell: () => void;
+  resetSudoku: () => void;
 }) {
   const { mode, switchMode } = useContext(DefaultSudokuContext);
 
@@ -44,24 +51,35 @@ export function ToolArea({
 
   return (
     <div>
-      <div>Tool Area</div>
-      <Tooltip title="Show all candidates(Press C)">
-        <IconButton onClick={() => showAllCandidates()}>
-          <AutoFixHighIcon sx={{ color: purple[300] }} />
+      <div className="flex items-center gap-2 justify-end">
+        <IconButton onClick={resetSudoku}>
+          <Replay sx={{ color: grey[800] }} />
         </IconButton>
-      </Tooltip>
-      <Tooltip title="Note Mode (Press X)">
-        <IconButton onClick={switchMode}>
-          <DriveFileRenameOutlineIcon sx={{ color: mode === 'normal' ? undefined : indigo[700] }} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Hint">
-        <span>
-          <IconButton onClick={getHint} disabled={disabledHint}>
-            <QuestionMarkIcon sx={{ color: disabledHint ? undefined : yellow[800] }} />
+        <Tooltip title="Delete the cell">
+          <IconButton onClick={handleDeleteCell}>
+            <BackspaceIcon sx={{ color: red[500] }} />
           </IconButton>
-        </span>
-      </Tooltip>
+        </Tooltip>
+        <Tooltip title="Show all candidates(Press C)">
+          <IconButton onClick={() => showAllCandidates()}>
+            <AutoFixHighIcon sx={{ color: purple[300] }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Note Mode (Press X)">
+          <IconButton onClick={switchMode}>
+            <DriveFileRenameOutlineIcon
+              sx={{ color: mode === 'normal' ? undefined : indigo[700] }}
+            />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Hint">
+          <span>
+            <IconButton onClick={getHint} disabled={disabledHint}>
+              <QuestionMarkIcon sx={{ color: disabledHint ? undefined : yellow[800] }} />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
       {/* Hint scope */}
       {mode === 'hint' && hint ? (
         <div

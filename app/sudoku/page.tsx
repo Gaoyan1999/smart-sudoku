@@ -14,6 +14,7 @@ import { DefaultSudokuContext } from '../context/sudoku-context';
 import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
 import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY, MOCK_SUDOKU_ID } from '../const';
 import { getHint } from '../utils/hint';
+import { Timer } from '../ui/timer';
 
 export default function Page() {
   const [sudoku, setSudokuInternal] = useState<Sudoku>(getDefaultSudoku);
@@ -105,6 +106,11 @@ export default function Page() {
     } else {
       setNotingCandidates(rowIndex, colIndex, num);
     }
+  }
+  function handleDeleteCell() {
+    if (!sudoku.context.selectedPosition) return;
+    const { rowIndex, colIndex } = sudoku.context.selectedPosition;
+    setCellValue(rowIndex, colIndex, 0);
   }
 
   function setCellValue(rowIndex: number, colIndex: number, val: number) {
@@ -407,13 +413,18 @@ export default function Page() {
           }
         </div>
         <div className="flex-shrink-0">
+          <div className="flex justify-end">
+            <Timer sudoku={sudoku} />
+          </div>
           <ToolArea
             sudoku={sudoku}
             showAllCandidates={fillAllCandidates}
             handleNumberInput={handleNumberInput}
+            handleDeleteCell={handleDeleteCell}
             getHint={getOneHint}
             rejectHint={clearHint}
             applyHint={applyHint}
+            resetSudoku={resetSudoku}
           />
         </div>
       </DefaultSudokuContext.Provider>

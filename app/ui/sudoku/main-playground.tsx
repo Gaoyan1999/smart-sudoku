@@ -6,6 +6,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { blue } from '@mui/material/colors';
 import { InformationBar } from './information-bar';
 import { SudokuBody } from './sudoku-body';
+import { Timer } from '../timer';
 
 export function MainPlayground({
   sudoku,
@@ -25,12 +26,7 @@ export function MainPlayground({
 
   return (
     <>
-      <InformationBar
-        sudoku={sudoku}
-        resetSudoku={resetSudoku}
-        setDifficulty={setDifficulty}
-        exitOwnPuzzle={exitOwnPuzzle}
-      />
+      <InformationBar sudoku={sudoku} setDifficulty={setDifficulty} exitOwnPuzzle={exitOwnPuzzle} />
       <div className="relative flex justify-center mt-2">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer z-[50]" onClick={togglePause}>
