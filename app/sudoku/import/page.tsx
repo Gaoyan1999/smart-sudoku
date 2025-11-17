@@ -129,6 +129,11 @@ export default function Page() {
     const { rowIndex, colIndex } = sudoku.context.selectedPosition;
     setCellValue(rowIndex, colIndex, num);
   }
+  function handleDeleteAll() {
+    setSudoku(() => {
+      return { ...getMakingNewPuzzleSudoku() };
+    });
+  }
 
   function handleDeleteCell() {
     if (!sudoku.context.selectedPosition) return;
@@ -142,12 +147,14 @@ export default function Page() {
       alert(errorMessage);
       return;
     }
+    console.log('mission', data?.mission);
+    console.log('solution', data?.solution);
     // popup a dialog: saying that the sudoku is valid, and ask user to confirm if they want to play this sudoku.
     if (confirm('The sudoku is valid, and ask user to confirm if they want to play this sudoku.')) {
       // save the sudoku to local storage and navigate to main sudoku page
       const { mission, solution } = data!;
+
       const sudoku = constructSudoku({ mission, solution });
-      console.log('sudoku', sudoku);
       localStorage.setItem(LOCAL_STORAGE_KEY_SUDOKU_HISTORY, JSON.stringify(sudoku));
       router.push('/sudoku');
     }
@@ -166,6 +173,9 @@ export default function Page() {
       <div className="flex-shrink-0">
         <div>Tool Area</div>
         <div className="mt-4 flex flex-col gap-2">
+          <Button variant="contained" onClick={handleDeleteAll} color="error">
+            Reset
+          </Button>
           <Button
             variant="outlined"
             startIcon={<DeleteIcon />}
@@ -174,13 +184,8 @@ export default function Page() {
           >
             Delete Cell
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<CheckCircleIcon />}
-            onClick={handleFinishMaking}
-            disabled={sudoku.context.isFinished}
-          >
-            Finish
+          <Button variant="contained" startIcon={<CheckCircleIcon />} onClick={handleFinishMaking}>
+            Complete & Play
           </Button>
         </div>
         <NumberInput handleNumberInput={handleNumberInput} />
