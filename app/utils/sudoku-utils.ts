@@ -94,8 +94,13 @@ export function renderCellPositions(positions: Position[]) {
 
 export function checkSudokuValid(matrix: SudokuCell[][]): {
   isValid: boolean;
+  data?: {
+    mission: string;
+    solution: string;
+  };
   errorMessage?: string;
 } {
+  const mission = matrix.map((row) => row.map((cell) => cell.value).join('')).join('');
   const existsDuplicateNumbers = (numbers: number[]) => {
     const uniqueNumbers = uniq(numbers);
     return numbers.length !== uniqueNumbers.length;
@@ -137,7 +142,15 @@ export function checkSudokuValid(matrix: SudokuCell[][]): {
   if (solutionCount.length > 1) {
     return { isValid: false, errorMessage: 'The sudoku has multiple solutions' };
   }
-  return { isValid: true };
+  return {
+    isValid: true,
+    data: {
+      mission: mission,
+      solution: solutionCount[0].solution
+        .map((row) => row.map((cell) => cell.value).join(''))
+        .join(''),
+    },
+  };
 }
 
 // Helper function to check if a number can be placed at a given position

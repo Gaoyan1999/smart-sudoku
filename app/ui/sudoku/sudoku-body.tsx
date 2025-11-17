@@ -88,10 +88,9 @@ export function SudokuBody({
               })
             : classNames({
                 'text-blue-800': cell.type === 'unknown',
-                'bg-blue-600': isSelected(rowIndex, colIndex) && cell.value !== 0,
-                // 'bg-blue-600 text-white':
-                'text-white':
-                  isSelected(rowIndex, colIndex) &&
+                'bg-blue-600': cell.value === selectedValue && cell.value !== 0,
+                'bg-blue-600 text-white':
+                  cell.value === selectedValue &&
                   cell.value !== 0 &&
                   cell.value === cell.realAnswer,
                 'text-red-600': cell.value !== cell.realAnswer,

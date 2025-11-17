@@ -27,6 +27,7 @@ export type SudokuContext = {
   elapsedTime: number;
   selectedPosition?: { rowIndex: number; colIndex: number };
   hint?: SudokuHint;
+  isImportedByUser?: boolean;
 };
 
 export type SudokuContextUpdateFunc = {

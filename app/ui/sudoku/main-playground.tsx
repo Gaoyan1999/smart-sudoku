@@ -12,18 +12,25 @@ export function MainPlayground({
   setPosition,
   resetSudoku,
   setDifficulty,
+  exitOwnPuzzle,
 }: {
   sudoku: Sudoku;
   setPosition: (rowIndex: number, colIndex: number) => void;
   resetSudoku: () => void;
   setDifficulty: (difficulty: SudokuDifficulty) => void;
+  exitOwnPuzzle: () => void;
 }) {
   const { togglePause } = useContext(DefaultSudokuContext);
   const { isPause, isLoading } = sudoku.context;
 
   return (
     <>
-      <InformationBar sudoku={sudoku} resetSudoku={resetSudoku} setDifficulty={setDifficulty} />
+      <InformationBar
+        sudoku={sudoku}
+        resetSudoku={resetSudoku}
+        setDifficulty={setDifficulty}
+        exitOwnPuzzle={exitOwnPuzzle}
+      />
       <div className="relative flex justify-center mt-2">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer z-[50]" onClick={togglePause}>
