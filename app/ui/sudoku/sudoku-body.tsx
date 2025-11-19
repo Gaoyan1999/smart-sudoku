@@ -241,6 +241,12 @@ export function SudokuBody({
       {/* highlight unit: column */}
       {renderHighlightColumnUnits()}
       <div className="relative w-full h-full">
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="pause-and-loading-mask">
+            <div className="animate-spin rounded-full border-t-2 border-b-2 border-blue-800 w-12 h-12"></div>
+          </div>
+        )}
         {/* Sudoku borders */}
         {renderSudokuBorders()}
         <table
