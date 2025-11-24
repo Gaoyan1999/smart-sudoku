@@ -279,7 +279,6 @@ function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] 
   preprocessWithDeduction(grid);
 
   const result: { solution: SudokuCell[][] }[] = [];
-  let solutionCount = 0;
 
   function solve(): void {
     solutionCount++;
@@ -316,6 +315,5 @@ function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] 
     result.push({ solution: cloneDeep(grid) });
   }
   solve();
-  console.log('solutionCount', solutionCount);
   return result;
 }
