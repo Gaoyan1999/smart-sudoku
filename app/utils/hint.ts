@@ -14,7 +14,6 @@ export function getHint(matrix: SudokuData['matrix']) {
   for (const rule of rules) {
     const hint = rule(matrix);
     if (hint) {
-      console.log(hint);
       return hint;
     }
   }

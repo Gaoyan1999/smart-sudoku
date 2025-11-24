@@ -62,7 +62,6 @@ export default function AdminPage() {
     matrix: Sudoku['data']['matrix']
   ): { puzzle: string; answer: string } | null => {
     const validation = checkSudokuValid(matrix);
-    console.log('validation', validation);
     if (!validation.isValid) {
       setError(validation.errorMessage || 'Invalid sudoku puzzle');
       return null;
@@ -304,7 +303,6 @@ export default function AdminPage() {
       row.map((cell, colIndex) => {
         const answerValue = +answerStr[rowIndex * 9 + colIndex];
         const wasEmpty = cell.value === 0;
-        console.log('wasEmpty', wasEmpty);
         const newCell: SudokuCell = {
           ...cell,
           realAnswer: answerValue,
@@ -316,7 +314,6 @@ export default function AdminPage() {
         return newCell;
       })
     );
-    console.log('newMatrix', newMatrix);
 
     setPuzzleSudoku((sudoku) => ({
       ...sudoku,

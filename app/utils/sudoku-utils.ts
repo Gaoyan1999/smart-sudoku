@@ -100,7 +100,6 @@ export function checkSudokuValid(matrix: SudokuCell[][]): {
   };
   errorMessage?: string;
 } {
-  console.log('checkSudokuValid', matrix);
   const mission = matrix.map((row) => row.map((cell) => cell.value).join('')).join('');
   const existsDuplicateNumbers = (numbers: number[]) => {
     const uniqueNumbers = uniq(numbers);
