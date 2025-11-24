@@ -100,6 +100,7 @@ export function checkSudokuValid(matrix: SudokuCell[][]): {
   };
   errorMessage?: string;
 } {
+  console.log('checkSudokuValid', matrix);
   const mission = matrix.map((row) => row.map((cell) => cell.value).join('')).join('');
   const existsDuplicateNumbers = (numbers: number[]) => {
     const uniqueNumbers = uniq(numbers);
@@ -160,7 +161,7 @@ function isValidPlacement(row: number, col: number, num: number, grid: SudokuCel
 }
 
 // Count the number of solutions for a sudoku puzzle
-function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] {
+export function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] {
   const grid: SudokuCell[][] = cloneDeep(matrix);
   const result: { solution: SudokuCell[][] }[] = [];
 
