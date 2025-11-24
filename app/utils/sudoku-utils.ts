@@ -281,7 +281,6 @@ function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] 
   const result: { solution: SudokuCell[][] }[] = [];
 
   function solve(): void {
-    solutionCount++;
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         // Find empty cell (value === 0)
