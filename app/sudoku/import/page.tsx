@@ -147,8 +147,6 @@ export default function Page() {
       alert(errorMessage);
       return;
     }
-    console.log('mission', data?.mission);
-    console.log('solution', data?.solution);
     // popup a dialog: saying that the sudoku is valid, and ask user to confirm if they want to play this sudoku.
     if (confirm('The sudoku is valid, and ask user to confirm if they want to play this sudoku.')) {
       // save the sudoku to local storage and navigate to main sudoku page

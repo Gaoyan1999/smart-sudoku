@@ -226,7 +226,6 @@ export default function Page() {
   }
 
   function resetSudoku() {
-    console.log('resetSudoku');
     setSudoku((sudoku) => {
       const matrix = sudoku.data.matrix;
       matrix.forEach((row, rowIndex) => {
