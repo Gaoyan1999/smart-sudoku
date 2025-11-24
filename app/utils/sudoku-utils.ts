@@ -1,6 +1,12 @@
-import { Position, SudokuCell, SudokuData } from '../types/sudoku';
+import { Position, SudokuCell, SudokuData, SudokuCellWithPosition } from '../types/sudoku';
 import { cloneDeep, uniq } from 'lodash';
-import { getBlock, getCellsInSameColumn, getCellsInSameRow, getRelatedCells } from './location';
+import {
+  getBlock,
+  getCellsInSameColumn,
+  getCellsInSameRow,
+  getRelatedCells,
+  getCellsInSameBlock,
+} from './location';
 
 export function fillAllCandidate(matrix: SudokuData['matrix']) {
   matrix.forEach((row, rowIndex) => {
@@ -159,9 +165,119 @@ function isValidPlacement(row: number, col: number, num: number, grid: SudokuCel
   return allRelatedCells.every((cell) => cell.value !== num);
 }
 
+// Clean matrix: set type correctly (0 -> unknown, 1-9 -> known) and update actualCandidates
+function cleanMatrix(matrix: SudokuCell[][]): void {
+  matrix.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      // Set type based on value
+      cell.type = cell.value === 0 ? 'unknown' : 'known';
+
+      // Update actualCandidates for unknown cells
+      if (cell.type === 'unknown') {
+        cell.actualCandidates = findMissingNumbers(
+          uniq(
+            getRelatedCells({ rowIndex, colIndex }, matrix)
+              .filter((cell) => cell.value !== 0)
+              .map((cell) => cell.value)
+          )
+        );
+      } else {
+        cell.actualCandidates = [];
+      }
+    });
+  });
+}
+
+// Apply deduction rules to fill cells that can be determined
+// Returns true if any cell was filled, false otherwise
+function applyDeductionRules(matrix: SudokuCell[][]): boolean {
+  let filled = false;
+
+  // Rule 1: Sole Candidate - only one candidate in a cell
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      const cell = matrix[i][j];
+      if (cell.type === 'unknown' && cell.actualCandidates.length === 1) {
+        cell.value = cell.actualCandidates[0];
+        console.log('Sole Candidate cell[', i, j, '] =', cell.value);
+        cell.type = 'known';
+        cell.actualCandidates = [];
+        filled = true;
+        // Update related cells' candidates
+        cleanMatrix(matrix);
+        continue;
+      }
+    }
+  }
+
+  // Rule 2: Unique Solution - only one solution for row/column/block
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      const cell = matrix[i][j];
+      if (cell.type !== 'unknown') {
+        continue;
+      }
+
+      const cellWithPos: SudokuCellWithPosition = {
+        ...cell,
+        position: { rowIndex: i, colIndex: j },
+      };
+      const checkLocations = [
+        { getCells: getCellsInSameBlock, type: 'block' },
+        { getCells: getCellsInSameRow, type: 'row' },
+        { getCells: getCellsInSameColumn, type: 'column' },
+      ] as const;
+
+      for (const { getCells } of checkLocations) {
+        const relatedCells = getCells(cellWithPos.position, matrix);
+        const candidates: number[] = [];
+        relatedCells.forEach((c) => {
+          if (c.position.rowIndex !== i || c.position.colIndex !== j) {
+            candidates.push(...c.actualCandidates);
+          }
+        });
+        const candidatesSet = new Set(candidates);
+        const uniqueCandidate = cell.actualCandidates.find((val) => !candidatesSet.has(val));
+
+        if (uniqueCandidate) {
+          cell.value = uniqueCandidate;
+          cell.type = 'known';
+          cell.actualCandidates = [];
+          filled = true;
+          // Update related cells' candidates
+          cleanMatrix(matrix);
+          console.log('Unique Solution found for cell[', i, j, '] =', cell.value);
+          break;
+        }
+      }
+      if (filled) break;
+    }
+    if (filled) break;
+  }
+
+  return filled;
+}
+
+// Preprocess matrix using deduction rules before DFS
+function preprocessWithDeduction(matrix: SudokuCell[][]): void {
+  cleanMatrix(matrix);
+
+  // Keep applying rules until no more cells can be filled
+  let changed = true;
+  let count = 0;
+  while (changed || count <= 81) {
+    changed = applyDeductionRules(matrix);
+    count++;
+  }
+}
+
 // Count the number of solutions for a sudoku puzzle
-export function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] {
+function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[][] }[] {
   const grid: SudokuCell[][] = cloneDeep(matrix);
+
+  // Preprocess: clean matrix and apply deduction rules
+  preprocessWithDeduction(grid);
+
   const result: { solution: SudokuCell[][] }[] = [];
 
   function solve(): void {
@@ -197,7 +313,6 @@ export function countSolutions(matrix: SudokuCell[][]): { solution: SudokuCell[]
     // All cells filled, solution found
     result.push({ solution: cloneDeep(grid) });
   }
-
   solve();
   return result;
 }
