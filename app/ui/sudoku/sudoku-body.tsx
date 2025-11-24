@@ -59,7 +59,13 @@ export function SudokuBody({
     const cell = matrix[rowIndex][colIndex];
     const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
     if (mode === 'making-new-puzzle') {
-      return <div className={'normal-mode-cell'}>{cell.value === 0 ? undefined : cell.value}</div>;
+      return (
+        <div
+          className={'normal-mode-cell' + classNames({ 'text-blue-600': cell.type === 'unknown' })}
+        >
+          {cell.value === 0 ? undefined : cell.value}
+        </div>
+      );
     }
     if (isCellInHintMode(rowIndex, colIndex) && hint?.ruleType === 'fillCellDirectly') {
       return <div className="normal-mode-cell text-white animate-hint-flash">{hint.answer}</div>;
