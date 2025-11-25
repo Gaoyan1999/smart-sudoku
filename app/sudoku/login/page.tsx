@@ -24,7 +24,7 @@ export default function LoginPage() {
         </Typography>
 
         <Box component="form" action={formAction} sx={{ mt: 3 }}>
-          {/* Email 输入 */}
+          {/* email input */}
           <TextField
             margin="normal"
             required
@@ -39,7 +39,7 @@ export default function LoginPage() {
             disabled={isPending}
           />
 
-          {/* Password 输入 */}
+          {/* password input */}
           <TextField
             margin="normal"
             required
