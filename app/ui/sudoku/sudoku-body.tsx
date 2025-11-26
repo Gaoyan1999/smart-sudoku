@@ -6,7 +6,7 @@ import { NotingCell } from './noting-cell';
 import { isEqual } from 'lodash';
 
 function getBlockPosition(blockIndex: number) {
-  // 计算 block 的行和列位置 (0-2)
+  // Calculate the row and column position of the block (0-2)
   const blockRow = Math.floor(blockIndex / 3);
   const blockCol = blockIndex % 3;
 
@@ -109,7 +109,7 @@ export function SudokuBody({
     );
   }
 
-  // 示例：假设我们要高亮第 n 个 block（这里用 4 作为示例，表示中间的 block）
+  // Example: Assume we want to highlight the nth block (using 4 as an example here, representing the middle block)
 
   function renderHighlightBlockUnits() {
     if (!isHintMode || !hint?.highlightUnits?.length) return null;
