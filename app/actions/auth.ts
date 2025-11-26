@@ -52,11 +52,11 @@ export async function login(
     }
 
     // login successfully, redirect to admin page
-    // 注意：redirect() 会抛出特殊错误来触发重定向，不应该被 catch 捕获
+    // note: redirect() will throw an error with the digest property, should not be caught
     redirect('/sudoku/admin');
   } catch (error) {
     // check if it is a redirect error, if so, throw it again
-    // redirect() 会抛出带有 digest 属性的错误
+    // redirect() will throw an error with the digest property
     if (
       error instanceof Error &&
       'digest' in error &&
