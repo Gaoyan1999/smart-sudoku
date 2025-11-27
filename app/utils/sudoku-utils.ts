@@ -18,6 +18,7 @@ export function fillAllCandidate(matrix: SudokuData['matrix']) {
             .map((cell) => cell.value)
         )
       );
+      // cell.actualCandidates = [...cell.notingCandidates];
     });
   });
   return matrix;
@@ -88,6 +89,9 @@ export function isSudokuFinished(matrix: SudokuCell[][]) {
 
 export function isAnsweredCell(cell: SudokuCell) {
   return cell.type === 'known' || (cell.type === 'unknown' && cell.value === cell.realAnswer);
+}
+export function isUnansweredCell(cell: SudokuCell) {
+  return !isAnsweredCell(cell);
 }
 
 export function renderCellPosition(position: Position) {
