@@ -26,31 +26,29 @@ export function Banner() {
   };
   return (
     <header className="w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between h-16">
-          {/* Left side: Menu, Logo, Game Modes */}
-          <div className="flex items-center space-x-6">
-            {/* Hamburger Menu */}
-            <IconButton
-              onClick={handleClick}
-              sx={{
-                color: 'text.primary',
-              }}
+      <div className="ml-4 flex items-center justify-between h-16">
+        {/* Left side: Menu, Logo, Game Modes */}
+        <div className="flex items-center space-x-6">
+          {/* Hamburger Menu */}
+          <IconButton
+            onClick={handleClick}
+            sx={{
+              color: 'text.primary',
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <MenuItem onClick={solveOwnPuzzle}>Solve Own Puzzle</MenuItem>
+          </Menu>
+          {/* Logo */}
+          <div className="flex items-center">
+            <h1
+              className="text-2xl font-bold text-gray-900 cursor-pointer"
+              onClick={handleClickLogo}
             >
-              <MenuIcon />
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-              <MenuItem onClick={solveOwnPuzzle}>Solve Own Puzzle</MenuItem>
-            </Menu>
-            {/* Logo */}
-            <div className="flex items-center">
-              <h1
-                className="text-2xl font-bold text-gray-900 cursor-pointer"
-                onClick={handleClickLogo}
-              >
-                Smart Sudoku
-              </h1>
-            </div>
+              Smart Sudoku
+            </h1>
           </div>
         </div>
       </div>

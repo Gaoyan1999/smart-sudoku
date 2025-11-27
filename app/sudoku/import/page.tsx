@@ -164,7 +164,6 @@ export default function Page() {
         <SudokuBody sudoku={sudoku} setPosition={setPosition} />
       </div>
       <div className="flex-shrink-0">
-        <div>Tool Area</div>
         <div className="mt-4 flex flex-col gap-2">
           <Button variant="contained" onClick={handleDeleteAll} color="error">
             Reset
