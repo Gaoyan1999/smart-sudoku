@@ -10,12 +10,12 @@ import { Timer } from '../timer';
 import { useSudoku } from '../../context/sudoku-provider';
 
 export function InformationBar() {
-  const { sudoku, setDifficulty, exitOwnPuzzle } = useSudoku();
+  const { sudoku, getNewSudoku, exitOwnPuzzle } = useSudoku();
   const { isImportedByUser } = sudoku.context;
   const difficulty = sudoku.data.difficulty;
 
   const handleChange = (event: SelectChangeEvent) => {
-    setDifficulty(event.target.value as SudokuDifficulty);
+    getNewSudoku(event.target.value as SudokuDifficulty);
   };
 
   return (

@@ -23,7 +23,7 @@ export interface SudokuContextValue {
   setCellValue: (rowIndex: number, colIndex: number, val: number) => void;
   setNotingCandidates: (rowIndex: number, colIndex: number, candidateNumber: number) => void;
   exitOwnPuzzle: () => Promise<void>;
-  setDifficulty: (difficulty: SudokuDifficulty) => Promise<void>;
+  getNewSudoku: (difficulty: SudokuDifficulty) => Promise<void>;
   resetSudoku: () => void;
   switchMode: () => void;
   getOneHint: () => void;
@@ -236,12 +236,8 @@ export function SudokuProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function setDifficulty(difficulty: SudokuDifficulty) {
-    if (
-      !confirm(
-        `Are you sure you want to change difficulty to ${difficulty}? Current progress will be lost.`
-      )
-    ) {
+  async function getNewSudoku(difficulty: SudokuDifficulty) {
+    if (!confirm(`Are you sure you want to start a new puzzle? Current progress will be lost.`)) {
       return;
     }
     setSudokuInternal((sudoku) => ({
@@ -355,7 +351,7 @@ export function SudokuProvider({ children }: { children: ReactNode }) {
     setCellValue,
     setNotingCandidates,
     exitOwnPuzzle,
-    setDifficulty,
+    getNewSudoku,
     resetSudoku,
     switchMode,
     getOneHint,

@@ -100,7 +100,7 @@ export default function Page() {
       <div className="flex-shrink-0 flex-grow">
         <MainPlayground />
       </div>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 md:max-w-[300px]">
         <div className="hidden md:flex justify-end">
           <Timer />
         </div>

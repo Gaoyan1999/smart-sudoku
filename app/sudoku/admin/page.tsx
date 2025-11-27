@@ -52,7 +52,7 @@ export default function AdminPage() {
   const [isSolutionShown, setIsSolutionShown] = useState(false);
 
   // Common state
-  const [difficulty, setDifficulty] = useState<SudokuDifficulty>('Easy');
+  const [difficulty, getNewSudoku] = useState<SudokuDifficulty>('Easy');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -195,7 +195,7 @@ export default function AdminPage() {
         setValidatedSolution(null);
         setIsSolutionShown(false);
       }
-      setDifficulty('Easy');
+      getNewSudoku('Easy');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to upload sudoku puzzle. Please try again.'
@@ -349,7 +349,7 @@ export default function AdminPage() {
               id="difficulty"
               value={difficulty}
               label="Difficulty"
-              onChange={(e) => setDifficulty(e.target.value as SudokuDifficulty)}
+              onChange={(e) => getNewSudoku(e.target.value as SudokuDifficulty)}
             >
               {DIFFICULTIES.map((diff) => (
                 <MenuItem key={diff} value={diff}>
