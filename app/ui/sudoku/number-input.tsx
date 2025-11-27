@@ -1,8 +1,8 @@
-import { useContext } from 'react';
-import { DefaultSudokuContext } from '../../context/sudoku-context';
+import { useSudoku } from '../../context/sudoku-provider';
 
 export function NumberInput({ handleNumberInput }: { handleNumberInput: (num: number) => void }) {
-  const { isPause } = useContext(DefaultSudokuContext);
+  const { sudoku } = useSudoku();
+  const { isPause } = sudoku.context;
 
   return (
     <div className="grid grid-cols-9 md:grid-cols-3 gap-1 mt-2 w-full md:max-w-[200px]">

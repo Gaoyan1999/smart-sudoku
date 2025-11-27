@@ -1,30 +1,17 @@
 import './main-playground.css';
-import { Sudoku, SudokuDifficulty } from '../../types/sudoku';
-import { useContext } from 'react';
-import { DefaultSudokuContext } from '../../context/sudoku-context';
+import { useSudoku } from '../../context/sudoku-provider';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { blue } from '@mui/material/colors';
 import { InformationBar } from './information-bar';
 import { SudokuBody } from './sudoku-body';
 
-export function MainPlayground({
-  sudoku,
-  setPosition,
-  setDifficulty,
-  exitOwnPuzzle,
-}: {
-  sudoku: Sudoku;
-  setPosition: (rowIndex: number, colIndex: number) => void;
-  resetSudoku: () => void;
-  setDifficulty: (difficulty: SudokuDifficulty) => void;
-  exitOwnPuzzle: () => void;
-}) {
-  const { togglePause } = useContext(DefaultSudokuContext);
+export function MainPlayground() {
+  const { sudoku, togglePause, setPosition } = useSudoku();
   const { isPause, isLoading } = sudoku.context;
 
   return (
     <>
-      <InformationBar sudoku={sudoku} setDifficulty={setDifficulty} exitOwnPuzzle={exitOwnPuzzle} />
+      <InformationBar />
       <div className="relative flex justify-center mt-2">
         {isPause ? (
           <div className="pause-and-loading-mask cursor-pointer z-[50]" onClick={togglePause}>

@@ -1,12 +1,11 @@
-import { useContext, useState, useEffect } from 'react';
-import { DefaultSudokuContext } from '../../context/sudoku-context';
+import { useState, useEffect } from 'react';
+import { useSudoku } from '../../context/sudoku-provider';
 import { IconButton, Tooltip } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { purple, indigo, yellow, green, red } from '@mui/material/colors';
 import * as React from 'react';
-import { Sudoku } from '@/app/types/sudoku';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { NumberInput } from './number-input';
@@ -14,28 +13,19 @@ import BackspaceIcon from '@mui/icons-material/Backspace';
 import { Replay } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
-export function ToolArea({
-  sudoku,
-  showAllCandidates,
-  handleNumberInput,
-  getHint,
-  rejectHint,
-  applyHint,
-  handleDeleteCell,
-  resetSudoku,
-}: {
-  sudoku: Sudoku;
-  showAllCandidates: () => void;
-  handleNumberInput: (num: number) => void;
-  getHint: () => void;
-  rejectHint: () => void;
-  applyHint: () => void;
-  handleDeleteCell: () => void;
-  resetSudoku: () => void;
-}) {
-  const { mode, switchMode } = useContext(DefaultSudokuContext);
-
-  const { hint } = sudoku.context;
+export function ToolArea() {
+  const {
+    sudoku,
+    fillAllCandidates,
+    handleNumberInput,
+    getOneHint,
+    clearHint,
+    applyHint,
+    handleDeleteCell,
+    resetSudoku,
+    switchMode,
+  } = useSudoku();
+  const { mode, hint } = sudoku.context;
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -61,7 +51,7 @@ export function ToolArea({
           </IconButton>
         </Tooltip>
         <Tooltip title="Show all candidates(Press C)">
-          <IconButton onClick={() => showAllCandidates()}>
+          <IconButton onClick={fillAllCandidates}>
             <AutoFixHighIcon sx={{ color: purple[300] }} />
           </IconButton>
         </Tooltip>
@@ -74,7 +64,7 @@ export function ToolArea({
         </Tooltip>
         <Tooltip title="Hint">
           <span>
-            <IconButton onClick={getHint} disabled={disabledHint}>
+            <IconButton onClick={getOneHint} disabled={disabledHint}>
               <QuestionMarkIcon sx={{ color: disabledHint ? undefined : yellow[800] }} />
             </IconButton>
           </span>
@@ -87,7 +77,7 @@ export function ToolArea({
         >
           <div>{hint.hintMessage}</div>
           <div className="flex justify-end">
-            <IconButton onClick={rejectHint}>
+            <IconButton onClick={clearHint}>
               <CancelIcon sx={{ color: red[700] }} />
             </IconButton>
             <IconButton onClick={applyHint}>
