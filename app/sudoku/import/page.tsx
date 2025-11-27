@@ -87,11 +87,6 @@ export default function Page() {
     } else if (code === 'ArrowDown') {
       setPosition(rowIndex + 1 > 8 ? 8 : rowIndex + 1, colIndex);
     }
-    const matrix = sudoku.data.matrix;
-    const targetCell = matrix[rowIndex][colIndex];
-    if (targetCell.type !== 'unknown') {
-      return;
-    }
     if (sudoku.context.isFinished) {
       return;
     }
@@ -110,7 +105,7 @@ export default function Page() {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
 
-    if (cell.type !== 'unknown' || val < 0 || val > 9) {
+    if (val < 0 || val > 9) {
       return;
     }
     cell.value = val;
@@ -169,7 +164,6 @@ export default function Page() {
         <SudokuBody sudoku={sudoku} setPosition={setPosition} />
       </div>
       <div className="flex-shrink-0">
-        <div>Tool Area</div>
         <div className="mt-4 flex flex-col gap-2">
           <Button variant="contained" onClick={handleDeleteAll} color="error">
             Reset
