@@ -8,7 +8,7 @@ import { getRelatedCells } from '../utils/location';
 import { fillAllCandidate, findMissingNumbers, isSudokuFinished } from '../utils/sudoku-utils';
 import { fetchNewSudokuPuzzleApi } from '../lib/sudoku-api-client';
 import { LOCAL_STORAGE_KEY_SUDOKU_HISTORY, MOCK_SUDOKU_ID } from '../const';
-import { getHint } from '../utils/hint';
+import { applyExcludeCandidateHint, getHint } from '../utils/hint';
 
 export interface SudokuContextValue {
   sudoku: Sudoku;
@@ -328,6 +328,15 @@ export function SudokuProvider({ children }: { children: ReactNode }) {
       setCellValue(position.rowIndex, position.colIndex, answer);
     } else {
       // TODO: implement exclude candidate
+      const updatedMatrix = applyExcludeCandidateHint(sudoku.context.hint, sudoku.data.matrix);
+      console.log(updatedMatrix);
+      setSudokuInternal((sudoku) => ({
+        ...sudoku,
+        data: {
+          ...sudoku.data,
+          matrix: updatedMatrix,
+        },
+      }));
     }
     clearHint();
   }

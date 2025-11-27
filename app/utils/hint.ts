@@ -1,16 +1,26 @@
-import { uniqBy } from 'lodash';
+import { cloneDeep, remove, uniqBy } from 'lodash';
 import { SudokuCellWithPosition, SudokuData, SudokuHint } from '../types/sudoku';
 import {
   getBlock,
+  getBlockIndex,
   getCellsInSameBlock,
   getCellsInSameColumn,
   getCellsInSameRow,
+  getColumn,
   getRelatedCells,
+  getRow,
   isInSameBlock,
 } from './location';
-import { isAnsweredCell, renderCellPositions } from './sudoku-utils';
+import { isAnsweredCell, isUnansweredCell, renderCellPositions } from './sudoku-utils';
+
 export function getHint(matrix: SudokuData['matrix']) {
-  const rules = [isSoleCandidate, isUniqueSolution, blockColumnRowIntersectionElimination];
+  const rules = [
+    isSoleCandidate,
+    isUniqueSolution,
+    blockColumnRowIntersectionElimination,
+    rowIntersectionElimination,
+    columnIntersectionElimination,
+  ];
   for (const rule of rules) {
     const hint = rule(matrix);
     if (hint) {
@@ -148,8 +158,8 @@ function blockColumnRowIntersectionElimination(
       const isInSameColumn = cells.every((cell) => cell.position.colIndex === colIndex);
       if (isInSameRow || isInSameColumn) {
         const sameLine = isInSameRow
-          ? getCellsInSameRow(cells[0].position, matrix)
-          : getCellsInSameColumn(cells[0].position, matrix);
+          ? getRow(cells[0].position.rowIndex, matrix)
+          : getColumn(cells[0].position.colIndex, matrix);
 
         const sameLineNotSameBlock = sameLine.filter(
           (cell) => !isAnsweredCell(cell) && !isInSameBlock(cells[0].position, cell.position)
@@ -191,4 +201,124 @@ function blockColumnRowIntersectionElimination(
     }
   }
   return undefined;
+}
+
+function rowIntersectionElimination(matrix: SudokuData['matrix']): SudokuHint | undefined {
+  // loop each row
+  for (let i = 0; i < 9; i++) {
+    const cells = getRow(i, matrix);
+    // key: candidate number, value: cells with this candidate number
+    const candidatesMap = new Map<number, SudokuCellWithPosition[]>();
+    cells
+      .filter((cell) => !isAnsweredCell(cell))
+      .forEach((cell) => {
+        cell.actualCandidates.forEach((candidate) => {
+          if (candidatesMap.has(candidate)) {
+            candidatesMap.get(candidate)!.push(cell);
+          } else {
+            candidatesMap.set(candidate, [cell]);
+          }
+        });
+      });
+    for (const [candidate, cells] of [...candidatesMap.entries()].filter(
+      ([, cells]) => cells.length <= 3
+    )) {
+      // check cells are in the same block
+      const inSameBlock = cells.every((cell) => isInSameBlock(cells[0].position, cell.position));
+      if (!inSameBlock) {
+        continue;
+      }
+      const blockIndex = getBlockIndex(cells[0].position);
+      const sameBlockNotSameRow = getBlock(matrix, blockIndex)
+        .flat()
+        .filter((cell) => cell.position.rowIndex !== i)
+        .filter(isUnansweredCell);
+      const candidateCells = sameBlockNotSameRow.filter((cell) =>
+        cell.actualCandidates.includes(candidate)
+      );
+      if (candidateCells.length > 0) {
+        return {
+          ruleType: 'excludeCandidate',
+          rule: 'intersectionElimination',
+          excludeNumber: candidate,
+          primaryCells: candidateCells,
+          secondaryCells: cells,
+          highlightUnits: [],
+          hintMessage: `In row ${i + 1}, number ${candidate} can only be placed in cells ${renderCellPositions(cells.map((c) => c.position))},
+          then Number: ${candidate} cannot appear in any other cells in Block ${blockIndex + 1}, so candidate ${candidate} can be removed from ${renderCellPositions(candidateCells.map((c) => c.position))}.`,
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+function columnIntersectionElimination(matrix: SudokuData['matrix']): SudokuHint | undefined {
+  // loop each column
+  for (let j = 0; j < 9; j++) {
+    const cells = getColumn(j, matrix);
+    // key: candidate number, value: cells with this candidate number
+    const candidatesMap = new Map<number, SudokuCellWithPosition[]>();
+    cells
+      .filter((cell) => !isAnsweredCell(cell))
+      .forEach((cell) => {
+        cell.actualCandidates.forEach((candidate) => {
+          if (candidatesMap.has(candidate)) {
+            candidatesMap.get(candidate)!.push(cell);
+          } else {
+            candidatesMap.set(candidate, [cell]);
+          }
+        });
+      });
+    for (const [candidate, cells] of [...candidatesMap.entries()].filter(
+      ([, cells]) => cells.length <= 3
+    )) {
+      // check cells are in the same block
+      const inSameBlock = cells.every((cell) => isInSameBlock(cells[0].position, cell.position));
+      if (!inSameBlock) {
+        continue;
+      }
+      const blockIndex = getBlockIndex(cells[0].position);
+      const sameBlockNotSameColumn = getBlock(matrix, blockIndex)
+        .flat()
+        .filter((cell) => cell.position.colIndex !== j)
+        .filter(isUnansweredCell);
+      const candidateCells = sameBlockNotSameColumn.filter((cell) =>
+        cell.actualCandidates.includes(candidate)
+      );
+      if (candidateCells.length > 0) {
+        return {
+          ruleType: 'excludeCandidate',
+          rule: 'intersectionElimination',
+          excludeNumber: candidate,
+          primaryCells: candidateCells,
+          secondaryCells: cells,
+          highlightUnits: [],
+          hintMessage: `In column ${j + 1}, number ${candidate} can only be placed in cells ${renderCellPositions(cells.map((c) => c.position))},
+          then Number: ${candidate} cannot appear in any other cells in Block ${blockIndex + 1}, so candidate ${candidate} can be removed from ${renderCellPositions(candidateCells.map((c) => c.position))}.`,
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+export function applyExcludeCandidateHint(
+  hint: SudokuHint,
+  matrix: SudokuData['matrix']
+): SudokuData['matrix'] {
+  if (hint.ruleType !== 'excludeCandidate') {
+    return matrix;
+  }
+  const updatedMatrix = cloneDeep(matrix);
+  const { excludeNumber, primaryCells } = hint;
+  primaryCells.forEach(({ position }) => {
+    const cell = updatedMatrix[position.rowIndex][position.colIndex];
+    if (cell.type !== 'unknown') {
+      return;
+    }
+    remove(cell.actualCandidates, (candidate) => candidate === excludeNumber);
+    remove(cell.notingCandidates, (candidate) => candidate === excludeNumber);
+  });
+  return updatedMatrix;
 }

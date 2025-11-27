@@ -106,7 +106,7 @@ export function getBlock(
   blockIndex: number
 ): SudokuCellWithPosition[][] {
   const rowOffset = Math.floor(blockIndex / 3) * 3;
-  const colOffset = (blockIndex % 3) * 3;  
+  const colOffset = (blockIndex % 3) * 3;
   const block: SudokuCellWithPosition[][] = [];
   if (blockIndex < 0 || blockIndex > 8) {
     throw Error('Invalid block index');
@@ -120,4 +120,28 @@ export function getBlock(
     );
   }
   return block;
+}
+export function getBlockIndex(position: Position): number {
+  return Math.floor(position.rowIndex / 3) * 3 + Math.floor(position.colIndex / 3);
+}
+
+export function getRow(rowIndex: number, matrix: SudokuCell[][]): SudokuCellWithPosition[] {
+  const result: SudokuCellWithPosition[] = [];
+  for (let i = 0; i < matrix[rowIndex].length; i++) {
+    result.push({
+      ...matrix[rowIndex][i],
+      position: { rowIndex, colIndex: i },
+    });
+  }
+  return result;
+}
+export function getColumn(colIndex: number, matrix: SudokuCell[][]): SudokuCellWithPosition[] {
+  const result: SudokuCellWithPosition[] = [];
+  for (let i = 0; i < matrix.length; i++) {
+    result.push({
+      ...matrix[i][colIndex],
+      position: { rowIndex: i, colIndex },
+    });
+  }
+  return result;
 }
