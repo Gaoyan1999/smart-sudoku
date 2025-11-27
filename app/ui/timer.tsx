@@ -1,13 +1,12 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { secondToHourAndMinutes } from '../utils/common';
-import { DefaultSudokuContext } from '../context/sudoku-context';
+import { useSudoku } from '../context/sudoku-provider';
 import { Pause, PlayArrow } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
-import { Sudoku } from '../types/sudoku';
 
-export function Timer({ sudoku }: { sudoku: Sudoku }) {
-  const { elapsedTime, togglePause, updateElapsedTime } = useContext(DefaultSudokuContext);
-  const { isFinished, isPause, isLoading } = sudoku.context;
+export function Timer() {
+  const { sudoku, togglePause, updateElapsedTime } = useSudoku();
+  const { elapsedTime, isFinished, isPause, isLoading } = sudoku.context;
   useEffect(() => {
     if (isPause || isFinished || isLoading) {
       return;

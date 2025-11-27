@@ -26,7 +26,6 @@ import { checkSudokuValid } from '@/app/utils/sudoku-utils';
 import { SudokuBody } from '@/app/ui/sudoku/sudoku-body';
 import { getMakingNewPuzzleSudoku } from '../sudoku';
 import { throttle } from 'lodash';
-import { DefaultSudokuContext } from '@/app/context/sudoku-context';
 
 const DIFFICULTIES: SudokuDifficulty[] = ['Easy', 'Medium', 'Hard', 'Expert', 'Master'];
 
@@ -53,7 +52,7 @@ export default function AdminPage() {
   const [isSolutionShown, setIsSolutionShown] = useState(false);
 
   // Common state
-  const [difficulty, setDifficulty] = useState<SudokuDifficulty>('Easy');
+  const [difficulty, getNewSudoku] = useState<SudokuDifficulty>('Easy');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,7 +195,7 @@ export default function AdminPage() {
         setValidatedSolution(null);
         setIsSolutionShown(false);
       }
-      setDifficulty('Easy');
+      getNewSudoku('Easy');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to upload sudoku puzzle. Please try again.'
@@ -350,7 +349,7 @@ export default function AdminPage() {
               id="difficulty"
               value={difficulty}
               label="Difficulty"
-              onChange={(e) => setDifficulty(e.target.value as SudokuDifficulty)}
+              onChange={(e) => getNewSudoku(e.target.value as SudokuDifficulty)}
             >
               {DIFFICULTIES.map((diff) => (
                 <MenuItem key={diff} value={diff}>
@@ -379,53 +378,44 @@ export default function AdminPage() {
             <Box sx={{ mb: 3 }} tabIndex={1} onKeyDown={handleKeyDown} style={{ outline: 'none' }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                 <Box sx={{ maxWidth: '600px', width: '100%' }}>
-                  <DefaultSudokuContext.Provider
-                    value={{
-                      ...puzzleSudoku.context,
-                      switchMode: () => {},
-                      togglePause: () => {},
-                      updateElapsedTime: () => {},
-                    }}
-                  >
-                    <Box>
-                      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'end', gap: 1 }}>
-                        <Button variant="outlined" onClick={handleResetGrid} size="small">
-                          Reset Puzzle
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={handleFinish}
-                          size="small"
-                          disabled={isSolutionShown}
-                        >
-                          Finish
-                        </Button>
-                      </Box>
-                      {error && (
-                        <Alert severity="error" sx={{ mb: 2 }}>
-                          {error}
-                        </Alert>
-                      )}
-
-                      {success && (
-                        <Alert severity="success" sx={{ mb: 2 }}>
-                          {success}
-                        </Alert>
-                      )}
-                      <SudokuBody
-                        sudoku={puzzleSudoku}
-                        setPosition={isSolutionShown ? () => {} : setPosition}
-                      />
-                      {isSolutionShown && (
-                        <Box sx={{ mt: 2, p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
-                          <Typography variant="body2" color="success.dark">
-                            ✓ Puzzle validated! The answer is displayed in the grid. You can now
-                            upload it.
-                          </Typography>
-                        </Box>
-                      )}
+                  <Box>
+                    <Box sx={{ mb: 2, display: 'flex', justifyContent: 'end', gap: 1 }}>
+                      <Button variant="outlined" onClick={handleResetGrid} size="small">
+                        Reset Puzzle
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={handleFinish}
+                        size="small"
+                        disabled={isSolutionShown}
+                      >
+                        Finish
+                      </Button>
                     </Box>
-                  </DefaultSudokuContext.Provider>
+                    {error && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
+
+                    {success && (
+                      <Alert severity="success" sx={{ mb: 2 }}>
+                        {success}
+                      </Alert>
+                    )}
+                    <SudokuBody
+                      sudoku={puzzleSudoku}
+                      setPosition={isSolutionShown ? () => {} : setPosition}
+                    />
+                    {isSolutionShown && (
+                      <Box sx={{ mt: 2, p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+                        <Typography variant="body2" color="success.dark">
+                          ✓ Puzzle validated! The answer is displayed in the grid. You can now
+                          upload it.
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -465,16 +455,7 @@ export default function AdminPage() {
             </Typography>
             {textModeValidatedSolution && (
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <DefaultSudokuContext.Provider
-                  value={{
-                    ...textModeValidatedSolution.sudoku.context,
-                    switchMode: () => {},
-                    togglePause: () => {},
-                    updateElapsedTime: () => {},
-                  }}
-                >
-                  <SudokuBody sudoku={textModeValidatedSolution.sudoku} setPosition={() => {}} />
-                </DefaultSudokuContext.Provider>
+                <SudokuBody sudoku={textModeValidatedSolution.sudoku} setPosition={setPosition} />
               </Box>
             )}
           </DialogContent>

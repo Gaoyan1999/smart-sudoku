@@ -1,17 +1,23 @@
 'use client';
 
-import * as React from 'react';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { Button } from '@mui/material';
+import { useState, MouseEvent } from 'react';
+import { useSudoku } from '../context/sudoku-provider';
 
 export function Banner() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const { sudoku, getNewSudoku } = useSudoku();
   const router = useRouter();
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const pathname = usePathname();
+  const isMainPage = pathname === '/sudoku';
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -24,9 +30,12 @@ export function Banner() {
   const handleClickLogo = () => {
     router.push('/sudoku');
   };
+  function startNewGame() {
+    getNewSudoku(sudoku.data.difficulty);
+  }
   return (
     <header className="w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="ml-4 flex items-center justify-between h-16">
+      <div className="mx-4 flex items-center justify-between h-16">
         {/* Left side: Menu, Logo, Game Modes */}
         <div className="flex items-center space-x-6">
           {/* Hamburger Menu */}
@@ -51,6 +60,11 @@ export function Banner() {
             </h1>
           </div>
         </div>
+        {isMainPage && (
+          <Button variant="contained" color="primary" onClick={startNewGame}>
+            New Game
+          </Button>
+        )}
       </div>
     </header>
   );
