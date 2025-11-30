@@ -1,22 +1,11 @@
-import { useEffect } from 'react';
 import { secondToHourAndMinutes } from '../utils/common';
 import { useSudoku } from '../context/sudoku-provider';
 import { Pause, PlayArrow } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
 export function Timer() {
-  const { sudoku, togglePause, updateElapsedTime } = useSudoku();
-  const { elapsedTime, isFinished, isPause, isLoading } = sudoku.context;
-  useEffect(() => {
-    if (isPause || isFinished || isLoading) {
-      return;
-    }
-    const interval = setInterval(() => {
-      updateElapsedTime();
-    }, 1000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPause, isFinished, isLoading]);
+  const { sudoku, togglePause } = useSudoku();
+  const { elapsedTime, isFinished, isPause } = sudoku.context;
 
   return (
     <div className="flex items-center cursor-pointer">
