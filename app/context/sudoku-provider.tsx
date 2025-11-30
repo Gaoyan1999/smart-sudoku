@@ -74,6 +74,24 @@ export function SudokuProvider({ children }: { children: ReactNode }) {
     }
   }, [sudoku]);
 
+  // Timer interval - only one instance should run regardless of how many Timer components are rendered
+  useEffect(() => {
+    if (sudoku.context.isPause || sudoku.context.isFinished || sudoku.context.isLoading) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setSudokuInternal((prevSudoku) => ({
+        ...prevSudoku,
+        context: {
+          ...prevSudoku.context,
+          elapsedTime: prevSudoku.context.elapsedTime + 1,
+        },
+      }));
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sudoku.context.isPause, sudoku.context.isFinished, sudoku.context.isLoading]);
+
   // Protected setSudoku that respects pause/loading/hint mode
   function setSudoku(updater: Sudoku | ((prev: Sudoku) => Sudoku)) {
     if (sudoku.context.isPause || sudoku.context.isLoading || sudoku.context.mode === 'hint') {
