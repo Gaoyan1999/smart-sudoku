@@ -2,7 +2,6 @@
 
 import { signInWithPassword } from '@/app/lib/auth-api-client';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 
 export interface LoginFormState {
   errors?: {

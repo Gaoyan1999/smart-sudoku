@@ -1,9 +1,18 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useRef,
+  useMemo,
+} from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '../utils/supabase/client';
 import { AuthUser } from '../types/auth-user';
+import { usePathname } from 'next/navigation';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -16,35 +25,10 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClient();
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchUserWithRole(session.user);
-      } else {
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await fetchUserWithRole(session.user);
-      } else {
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  // Stable supabase instance across re-renders
+  const supabase = useMemo(() => createClient(), []);
+  const pathname = usePathname();
+  const pathnameRef = useRef(pathname);
 
   async function fetchUserWithRole(supabaseUser: User) {
     try {
@@ -77,6 +61,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }
+
+  async function checkSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session?.user) {
+      await fetchUserWithRole(session.user);
+    } else {
+      setUser(null);
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    checkSession();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await fetchUserWithRole(session.user);
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (pathnameRef.current === pathname) {
+      return;
+    }
+    pathnameRef.current = pathname;
+
+    const timer = setTimeout(() => {
+      checkSession();
+    }, 100);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const value: AuthContextValue = {
     user,
