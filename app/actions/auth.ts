@@ -2,6 +2,7 @@
 
 import { signInWithPassword } from '@/app/lib/auth-api-client';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 export interface LoginFormState {
   errors?: {
@@ -51,9 +52,9 @@ export async function login(
       };
     }
 
-    // login successfully, redirect to admin page
+    // login successfully, redirect to previous page or home page
     // note: redirect() will throw an error with the digest property, should not be caught
-    redirect('/sudoku/admin');
+    redirect('/sudoku');
   } catch (error) {
     // check if it is a redirect error, if so, throw it again
     // redirect() will throw an error with the digest property
