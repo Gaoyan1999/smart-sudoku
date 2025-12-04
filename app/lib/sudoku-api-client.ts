@@ -8,12 +8,28 @@ const supabase = createClient<Database>(
 );
 
 export async function fetchNewSudokuPuzzleApi(difficulty: SudokuDifficulty) {
+  // First, get the count of puzzles with this difficulty
+  const { count } = await supabase
+    .from('sudoku_puzzle')
+    .select('*', { count: 'exact', head: true })
+    .eq('difficulty', difficulty);
+
+  if (!count || count === 0) {
+    return null;
+  }
+
+  // Randomly select an offset
+  const randomOffset = Math.floor(Math.random() * count);
+
+  // Fetch only one record at the random offset
   const { data } = await supabase
     .from('sudoku_puzzle')
     .select()
     .eq('difficulty', difficulty)
+    .range(randomOffset, randomOffset)
     .returns<SudokuPuzzleEntity[]>();
-  return data?.[0];
+
+  return data?.[0] || null;
 }
 
 export async function insertSudokuPuzzleApi(
