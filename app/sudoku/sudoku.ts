@@ -34,7 +34,7 @@ export function getMakingNewPuzzleSudoku(): Sudoku {
           realAnswer: 0,
           notingCandidates: [],
           actualCandidates: [],
-          type: 'unknown',
+          type: 'known',
         }))
       ),
       id: MOCK_SUDOKU_ID,

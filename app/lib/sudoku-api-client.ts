@@ -15,3 +15,25 @@ export async function fetchNewSudokuPuzzleApi(difficulty: SudokuDifficulty) {
     .returns<SudokuPuzzleEntity[]>();
   return data?.[0];
 }
+
+export async function insertSudokuPuzzleApi(
+  puzzle: string,
+  answer: string,
+  difficulty: SudokuDifficulty
+) {
+  const { data, error } = await supabase
+    .from('sudoku_puzzle')
+    .insert({
+      puzzle,
+      answer,
+      difficulty,
+    })
+    .select()
+    .returns<SudokuPuzzleEntity[]>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.[0];
+}

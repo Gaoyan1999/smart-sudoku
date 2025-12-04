@@ -222,11 +222,6 @@ export default function Page() {
     } else if (code === 'ArrowDown') {
       setPosition(rowIndex + 1 > 8 ? 8 : rowIndex + 1, colIndex);
     }
-    const matrix = sudoku.data.matrix;
-    const targetCell = matrix[rowIndex][colIndex];
-    if (targetCell.type !== 'unknown') {
-      return;
-    }
     if (sudoku.context.isFinished) {
       return;
     }
@@ -245,7 +240,7 @@ export default function Page() {
     const matrix = sudoku.data.matrix;
     const cell = matrix[rowIndex][colIndex];
 
-    if (cell.type !== 'unknown' || val < 0 || val > 9) {
+    if (val < 0 || val > 9) {
       return;
     }
     cell.value = val;
@@ -282,8 +277,6 @@ export default function Page() {
       alert(errorMessage);
       return;
     }
-    console.log('mission', data?.mission);
-    console.log('solution', data?.solution);
     // popup a dialog: saying that the sudoku is valid, and ask user to confirm if they want to play this sudoku.
     if (confirm('The sudoku is valid, and ask user to confirm if they want to play this sudoku.')) {
       // save the sudoku to local storage and navigate to main sudoku page
@@ -311,7 +304,6 @@ export default function Page() {
         <SudokuBody sudoku={sudoku} setPosition={setPosition} />
       </div>
       <div className="flex-shrink-0">
-        <div>Tool Area</div>
         <div className="mt-4 flex flex-col gap-2">
           <Button
             variant="outlined"

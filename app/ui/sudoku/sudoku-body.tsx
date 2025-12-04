@@ -6,7 +6,7 @@ import { NotingCell } from './noting-cell';
 import { isEqual } from 'lodash';
 
 function getBlockPosition(blockIndex: number) {
-  // 计算 block 的行和列位置 (0-2)
+  // Calculate the row and column position of the block (0-2)
   const blockRow = Math.floor(blockIndex / 3);
   const blockCol = blockIndex % 3;
 
@@ -59,7 +59,13 @@ export function SudokuBody({
     const cell = matrix[rowIndex][colIndex];
     const showNotingCell = cell.value === 0 && cell.notingCandidates.length > 0;
     if (mode === 'making-new-puzzle') {
-      return <div className={'normal-mode-cell'}>{cell.value === 0 ? undefined : cell.value}</div>;
+      return (
+        <div
+          className={'normal-mode-cell' + classNames({ 'text-blue-600': cell.type === 'unknown' })}
+        >
+          {cell.value === 0 ? undefined : cell.value}
+        </div>
+      );
     }
     if (isCellInHintMode(rowIndex, colIndex) && hint?.ruleType === 'fillCellDirectly') {
       return <div className="normal-mode-cell text-white animate-hint-flash">{hint.answer}</div>;
@@ -89,7 +95,7 @@ export function SudokuBody({
             : classNames({
                 'text-blue-800': cell.type === 'unknown',
                 'bg-blue-600': isSelected(rowIndex, colIndex) && cell.value !== 0,
-                // 'bg-blue-600 text-white':
+                'bg-blue-600 text-white': cell.value === selectedValue && cell.value !== 0,
                 'text-white':
                   isSelected(rowIndex, colIndex) &&
                   cell.value !== 0 &&
@@ -103,7 +109,7 @@ export function SudokuBody({
     );
   }
 
-  // 示例：假设我们要高亮第 n 个 block（这里用 4 作为示例，表示中间的 block）
+  // Example: Assume we want to highlight the nth block (using 4 as an example here, representing the middle block)
 
   function renderHighlightBlockUnits() {
     if (!isHintMode || !hint?.highlightUnits?.length) return null;

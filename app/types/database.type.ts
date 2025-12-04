@@ -7,6 +7,9 @@ export interface Database {
       sudoku_puzzle: {
         Row: SudokuPuzzleEntity;
       };
+      user_roles: {
+        Row: UserRoleEntity;
+      };
     };
   };
 }
@@ -17,4 +20,11 @@ export interface SudokuPuzzleEntity {
   answer: string;
   created_at: string;
   difficulty: SudokuDifficulty;
+}
+
+export interface UserRoleEntity {
+  user_id: string;
+  role: 'user' | 'admin';
+  created_at: string;
+  updated_at: string;
 }

@@ -1,5 +1,5 @@
 import { Tooltip } from '@mui/material';
-import { Sudoku, SudokuDifficulty } from '@/app/types/sudoku';
+import { SudokuDifficulty } from '@/app/types/sudoku';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -7,21 +7,15 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { grey } from '@mui/material/colors';
 import { Timer } from '../timer';
+import { useSudoku } from '../../context/sudoku-provider';
 
-export function InformationBar({
-  sudoku,
-  setDifficulty,
-  exitOwnPuzzle,
-}: {
-  sudoku: Sudoku;
-  setDifficulty: (difficulty: SudokuDifficulty) => void;
-  exitOwnPuzzle: () => void;
-}) {
+export function InformationBar() {
+  const { sudoku, getNewSudoku, exitOwnPuzzle } = useSudoku();
   const { isImportedByUser } = sudoku.context;
   const difficulty = sudoku.data.difficulty;
 
   const handleChange = (event: SelectChangeEvent) => {
-    setDifficulty(event.target.value as SudokuDifficulty);
+    getNewSudoku(event.target.value as SudokuDifficulty);
   };
 
   return (
@@ -53,7 +47,7 @@ export function InformationBar({
           </Tooltip>
         )}
         <div className="md:hidden">
-          <Timer sudoku={sudoku} />
+          <Timer />
         </div>
       </div>
     </div>
