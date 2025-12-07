@@ -8,10 +8,9 @@ import { useRouter } from 'next/navigation';
 import { getMakingNewPuzzleSudoku } from '../sudoku';
 import { throttle } from 'lodash';
 import { NumberInput } from '@/app/ui/sudoku/number-input';
-import { Button, CircularProgress } from '@mui/material';
+import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ImageIcon from '@mui/icons-material/Image';
 import { checkSudokuValid, initMatrix, findMissingNumbers } from '@/app/utils/sudoku-utils';
 import { getRelatedCells } from '@/app/utils/location';
 import { uniq } from 'lodash';
@@ -20,6 +19,7 @@ import {
   LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU,
   LOCAL_STORAGE_KEY_SUDOKU_HISTORY,
 } from '@/app/const';
+import { OcrButton } from '@/app/ui/sudoku/ocr-button';
 
 function constructSudoku(data: { mission: string; solution: string }): Sudoku {
   return {
@@ -42,8 +42,6 @@ function constructSudoku(data: { mission: string; solution: string }): Sudoku {
 export default function Page() {
   const router = useRouter();
   const [sudoku, setSudoku] = useState<Sudoku>(getMakingNewPuzzleSudoku);
-  const [isOcrLoading, setIsOcrLoading] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // load data from local storage.
   useEffect(() => {
@@ -95,98 +93,6 @@ export default function Page() {
     }));
   }
 
-  const handleOcrImport = () => {
-    fileInputRef.current?.click();
-  };
-
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsOcrLoading(true);
-    setSudoku((prevSudoku) => ({
-      ...prevSudoku,
-      context: { ...prevSudoku.context, isLoading: true },
-    }));
-
-    try {
-      // Convert image to base64
-      const base64Image = await convertFileToBase64(file);
-      // base64Image will be used when calling the actual API
-      console.log('Image converted to base64, length:', base64Image.length);
-
-      // TODO: Call actual OCR API
-      // API request format: { "base64_image": "data:image/jpeg;base64,iVBOR...." }
-      // const response = await fetch('/api/ocr', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     base64_image: base64Image,
-      //   }),
-      // });
-      // const ocrResponse = await response.json();
-
-      // For now, hardcode the response
-      const mockResponse = {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          grid: [
-            [9, 2, 6, 0, 1, 5, 0, 0, 0],
-            [1, 5, 8, 7, 6, 3, 9, 0, 0],
-            [3, 0, 7, 9, 0, 0, 1, 8, 5],
-            [0, 0, 9, 0, 0, 0, 0, 3, 8],
-            [7, 3, 0, 0, 0, 0, 5, 9, 0],
-            [0, 0, 0, 3, 9, 5, 0, 0, 0],
-            [0, 7, 0, 0, 0, 0, 0, 1, 9],
-            [6, 9, 4, 0, 0, 0, 7, 0, 2],
-            [5, 0, 3, 6, 0, 0, 4, 0, 9],
-          ],
-          message: 'OCR处理成功',
-        }),
-      };
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 10000));
-
-      // Parse the response
-      const body = JSON.parse(mockResponse.body);
-      const grid = body.grid as number[][];
-
-      if (grid && Array.isArray(grid) && grid.length === 9) {
-        applyOcrGridToSudoku(grid);
-      }
-    } catch (error) {
-      console.error('OCR processing failed:', error);
-      alert('OCR processing failed. Please try again.');
-    } finally {
-      setIsOcrLoading(false);
-      setSudoku((prevSudoku) => ({
-        ...prevSudoku,
-        context: { ...prevSudoku.context, isLoading: false },
-      }));
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
   function setPosition(rowIndex: number, colIndex: number) {
     setSudoku((sudoku) => {
       return {
@@ -305,21 +211,18 @@ export default function Page() {
       </div>
       <div className="flex-shrink-0">
         <div className="mt-4 flex flex-col gap-2">
-          <Button
-            variant="outlined"
-            startIcon={isOcrLoading ? <CircularProgress size={20} /> : <ImageIcon />}
-            onClick={handleOcrImport}
-            disabled={isOcrLoading}
-            fullWidth
-          >
-            {isOcrLoading ? 'Processing...' : 'OCR Puzzle Import'}
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
+          <OcrButton
+            onFinish={applyOcrGridToSudoku}
+            onError={() => alert('OCR processing failed. Please try again.')}
+            onLoadingChange={(isLoading) => {
+              setSudoku((prevSudoku) => ({
+                ...prevSudoku,
+                context: {
+                  ...prevSudoku.context,
+                  isLoading,
+                },
+              }));
+            }}
           />
           <Button variant="contained" onClick={handleDeleteAll} color="error">
             Reset
