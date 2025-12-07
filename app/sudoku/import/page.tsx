@@ -3,6 +3,7 @@
 import { Sudoku } from '@/app/types/sudoku';
 import { SudokuBody } from '@/app/ui/sudoku/sudoku-body';
 import { KeyboardEventHandler, useEffect, useState } from 'react';
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { getMakingNewPuzzleSudoku } from '../sudoku';
 import { throttle } from 'lodash';
@@ -10,12 +11,15 @@ import { NumberInput } from '@/app/ui/sudoku/number-input';
 import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { checkSudokuValid, initMatrix } from '@/app/utils/sudoku-utils';
+import { checkSudokuValid, initMatrix, findMissingNumbers } from '@/app/utils/sudoku-utils';
+import { getRelatedCells } from '@/app/utils/location';
+import { uniq } from 'lodash';
 import {
   ID_SUDOKU_IMPORT,
   LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU,
   LOCAL_STORAGE_KEY_SUDOKU_HISTORY,
 } from '@/app/const';
+import { OcrButton } from '@/app/ui/sudoku/ocr-button';
 
 function constructSudoku(data: { mission: string; solution: string }): Sudoku {
   return {
@@ -38,6 +42,7 @@ function constructSudoku(data: { mission: string; solution: string }): Sudoku {
 export default function Page() {
   const router = useRouter();
   const [sudoku, setSudoku] = useState<Sudoku>(getMakingNewPuzzleSudoku);
+
   // load data from local storage.
   useEffect(() => {
     const sudokuDataStr = localStorage.getItem(LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU);
@@ -52,6 +57,42 @@ export default function Page() {
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_MAKING_NEW_PUZZLE_SUDOKU, JSON.stringify(sudoku));
   }, [sudoku]);
+
+  function applyOcrGridToSudoku(grid: number[][]) {
+    const newMatrix: Sudoku['data']['matrix'] = grid.map((row) =>
+      row.map((value) => ({
+        value: value,
+        realAnswer: value, // OCR doesn't provide solution, so use value as placeholder
+        type: (value === 0 ? 'unknown' : 'known') as 'unknown' | 'known',
+        notingCandidates: [] as number[],
+        actualCandidates: [] as number[],
+      }))
+    );
+
+    // Fill actualCandidates for unknown cells
+    newMatrix.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        if (cell.type === 'unknown') {
+          cell.actualCandidates = findMissingNumbers(
+            uniq(
+              getRelatedCells({ rowIndex, colIndex }, newMatrix)
+                .filter((cell) => cell.value !== 0)
+                .map((cell) => cell.value)
+            )
+          );
+        }
+      });
+    });
+
+    setSudoku((prevSudoku) => ({
+      ...prevSudoku,
+      data: {
+        ...prevSudoku.data,
+        matrix: newMatrix,
+      },
+    }));
+  }
+
   function setPosition(rowIndex: number, colIndex: number) {
     setSudoku((sudoku) => {
       return {
@@ -160,11 +201,29 @@ export default function Page() {
       tabIndex={1}
       onKeyDown={handleKeyDown}
     >
-      <div className="flex-shrink-0 flex-grow">
+      <div className="flex-shrink-0 flex-grow relative flex justify-center">
+        {sudoku.context.isLoading && (
+          <div className="pause-and-loading-mask">
+            <div className="animate-spin rounded-full border-t-2 border-b-2 border-blue-800 w-12 h-12"></div>
+          </div>
+        )}
         <SudokuBody sudoku={sudoku} setPosition={setPosition} />
       </div>
       <div className="flex-shrink-0">
         <div className="mt-4 flex flex-col gap-2">
+          <OcrButton
+            onFinish={applyOcrGridToSudoku}
+            onError={() => alert('OCR processing failed. Please try again.')}
+            onLoadingChange={(isLoading) => {
+              setSudoku((prevSudoku) => ({
+                ...prevSudoku,
+                context: {
+                  ...prevSudoku.context,
+                  isLoading,
+                },
+              }));
+            }}
+          />
           <Button variant="contained" onClick={handleDeleteAll} color="error">
             Reset
           </Button>

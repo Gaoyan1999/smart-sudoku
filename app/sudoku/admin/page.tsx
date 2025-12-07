@@ -26,6 +26,7 @@ import { checkSudokuValid } from '@/app/utils/sudoku-utils';
 import { SudokuBody } from '@/app/ui/sudoku/sudoku-body';
 import { getMakingNewPuzzleSudoku } from '../sudoku';
 import { throttle } from 'lodash';
+import { OcrButton } from '@/app/ui/sudoku/ocr-button';
 
 const DIFFICULTIES: SudokuDifficulty[] = ['Easy', 'Medium', 'Hard', 'Expert', 'Master'];
 
@@ -327,6 +328,23 @@ export default function AdminPage() {
     setSuccess('Puzzle validated successfully! Answer is now displayed. You can upload it now.');
   }
 
+  const handleOcrFinish = (grid: number[][]) => {
+    setCurrentSudoku((sudoku) => {
+      return {
+        ...sudoku,
+        data: {
+          ...sudoku.data,
+          matrix: sudoku.data.matrix.map((row, rowIndex) =>
+            row.map((cell, colIndex) => ({
+              ...cell,
+              value: grid[rowIndex][colIndex],
+            }))
+          ),
+        },
+      };
+    });
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
@@ -383,6 +401,10 @@ export default function AdminPage() {
                       <Button variant="outlined" onClick={handleResetGrid} size="small">
                         Reset Puzzle
                       </Button>
+                      <OcrButton
+                        onFinish={handleOcrFinish}
+                        onError={() => alert('OCR processing failed. Please try again.')}
+                      />
                       <Button
                         variant="contained"
                         onClick={handleFinish}
