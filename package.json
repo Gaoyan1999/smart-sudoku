@@ -28,7 +28,7 @@
     "@supabase/supabase-js": "^2.47.10",
     "@types/lodash": "^4.17.7",
     "lodash": "^4.17.21",
-    "next": "15.0.5",
+    "next": "15.1.9",
     "react": "^19.0.1",
     "react-dom": "^19.0.1"
   },
