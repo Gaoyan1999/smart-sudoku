@@ -53,3 +53,21 @@ export async function insertSudokuPuzzleApi(
 
   return data?.[0];
 }
+
+export async function sudokuOcrApi(base64Image: string): Promise<number[][]> {
+  const response = await fetch('/api/ocr', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ base64_image: base64Image }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'OCR processing failed');
+  }
+
+  const data = await response.json();
+  return data.grid;
+}
