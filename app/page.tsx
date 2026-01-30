@@ -1,6 +1,5 @@
-import { fetchNewSudokuPuzzleApi } from './lib/sudoku-api-client';
+import { redirect } from 'next/navigation';
 
-export default async function Page() {
-  await fetchNewSudokuPuzzleApi('Easy');
-  return <h1>Hello, Next.js!</h1>;
+export default function Page() {
+  redirect('/sudoku');
 }
